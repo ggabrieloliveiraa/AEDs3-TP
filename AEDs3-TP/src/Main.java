@@ -54,7 +54,7 @@ public class Main {
                 }
             }
 
-            //prm = parametros do obj
+            //prm = parametros do obj//
             String[] prm = new String[0];
             prm = tmp.split("separatepls", 0);
             System.out.println(prm[0]);
