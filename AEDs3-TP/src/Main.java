@@ -1,14 +1,14 @@
 import java.io.RandomAccessFile;
-//a
+
 
 public class Main {
     public static void main(String[] args){
 
-        Jogador j1= new Jogador(25, "Conceição", 49.90F);
-        Jogador j2= new Jogador(37, "José Carlos", 62.50F);
-        Jogador j3= new Jogador(291, "Pedro", 53.45F);
+        Movie j1= new Movie(25, "Conceição", 49.90F);
+        Movie j2= new Movie(37, "José Carlos", 62.50F);
+        Movie j3= new Movie(291, "Pedro", 53.45F);
 
-        Jogador j_temp= new Jogador();
+        Movie j_temp= new Movie();
 
         byte[] ba;
         int len;
@@ -16,7 +16,7 @@ public class Main {
 
         try {
 
-            RandomAccessFile arq = new RandomAccessFile("../dados/jogadores.db", "rw");
+            RandomAccessFile arq = new RandomAccessFile("../data/movies.csv", "rw");
 
             pos0=arq.getFilePointer();
             System.out.println("Registro iniciado na posição: "+pos0);
