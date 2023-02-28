@@ -23,12 +23,11 @@ public class Main {
         //Scanner sc = new Scanner (System.in);
         String line = "";
         int control = 0; //controle para separar cada elemento
-        int gameId = 0; //generate ids
+         //generate ids
 
         line = objReader.readLine();
-        System.out.println(line);
         line = objReader.readLine();
-        System.out.println(line);
+
 
         byte[] ba;
         int len;
@@ -37,12 +36,13 @@ public class Main {
         //ler cada linha
         //while ((line = objReader.readLine()) != null) {
         while (control == 0) {
+            int gameId = 0;
             String tmp = line;
             
             char x;
 
             //separando cada elemento do objeto    
-            for (int j = 0; j < tmp.length(); j++) {
+            for (int j = 0; j < line.length(); j++) {
                 if (tmp.charAt(j) == '\"'){
                     control++;
                 }
@@ -52,20 +52,19 @@ public class Main {
                     x = tmp.charAt(j);
                     tmp += x;
                 }
-                System.out.println(tmp);
             }
 
-            System.out.println(tmp);
             //prm = parametros do obj
             String[] prm = new String[0];
             prm = tmp.split("separatepls", 0);
+            System.out.println(prm[0]);
 
             //ordem que os elementos aparecem:
             //title,year,certificate,runtime,genre,rating,metascore,synopsis,director,votes,gross,cast1,cast2,cast3,cast4
 
-                Movie m_temp= new Movie(prm[0], prm[1], prm[2]);
+                Movie m_temp= new Movie(gameId, prm[0], prm[1]);
 
-                
+                gameId++;
 
 
                 try {
@@ -106,18 +105,18 @@ public class Main {
 
 class Movie{
     
-    protected String idMovie;
+    protected int idMovie;
     protected String nome;
     protected String pontos;
 
-    public Movie(String i, String n, String p){
+    public Movie(int i, String n, String p){
         idMovie =  i;
         nome = n;
         pontos = p;  
     }
     
     public Movie(){
-        idMovie = "";
+        idMovie = 0;
         nome = "";
         pontos = "";  
     }
@@ -126,7 +125,7 @@ class Movie{
         DecimalFormat df= new DecimalFormat("#,##0.00");
         return "\nID:"+idMovie +
                 "\nNome:"+nome +
-                "\nPontos:"+ df.format(pontos);
+                "\nPontos:"+ pontos;
     }
 
 
@@ -137,7 +136,7 @@ class Movie{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
-        dos.writeUTF(idMovie);
+        dos.writeInt(idMovie);
         dos.writeUTF(nome);
         dos.writeUTF(pontos);
 
@@ -149,7 +148,7 @@ class Movie{
         ByteArrayInputStream bais = new ByteArrayInputStream(ba);
         DataInputStream dis = new DataInputStream(bais);
 
-        idMovie=dis.readUTF();
+        idMovie=dis.readInt();
         nome=dis.readUTF();
         pontos=dis.readUTF();
 
