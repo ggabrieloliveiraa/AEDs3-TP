@@ -5,7 +5,8 @@ public class CRUD {
 	private RandomAccessFile file;
 
 	public CRUD(String nomeArquivo) throws IOException {
-		this.file = new RandomAccessFile(nomeArquivo, "rw");
+		String tmp = "../data/" + nomeArquivo; 
+		this.file = new RandomAccessFile(tmp, "rw");
 	}
 
 	public void fechar() throws IOException {

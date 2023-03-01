@@ -10,11 +10,12 @@ import java.util.Calendar;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Main2 {
 
 	public static void main(String[] args) {
-		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
+		List<Movie> filmes = readCsv("../data/movies.csv");
 		byte ba[];
 		int len;
 		Movie j_temp = new Movie();
@@ -31,7 +32,7 @@ public class Main2 {
 				fos.writeInt(ba.length); // tamanho do registro em bytes
 				fos.write(ba); // vetor de bytes que descrevem o objeto
 			}
-			fos.seek(600163);
+			fos.seek(860381);
 			len = fos.readInt();
 			System.out.println("len = " + len);
 			ba = new byte[len];
@@ -42,7 +43,7 @@ public class Main2 {
 			e.printStackTrace();
 		}
 		try {
-			CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+			CRUD crud = new CRUD("../data/arquivo.bin");
 			crud.buscar(5);
 			crud.fechar();
 		} catch (IOException e) {
@@ -78,7 +79,7 @@ public class Main2 {
 	}
 
 	public static void readBinary() {
-		File file = new File("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+		File file = new File("../data/arquivo.bin");
 
 		try {
 			FileInputStream inputStream = new FileInputStream(file);
