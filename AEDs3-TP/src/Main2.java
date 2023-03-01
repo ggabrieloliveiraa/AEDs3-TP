@@ -25,11 +25,15 @@ public class Main2 {
 			for (int i = 0; i < filmes.size(); i++) {
 				System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
+				if(i < 10) {
+				System.out.println(ba.length);
+				}
 				fos.writeInt(ba.length); // tamanho do registro em bytes
 				fos.write(ba); // vetor de bytes que descrevem o objeto
 			}
 			fos.seek(600163);
 			len = fos.readInt();
+			System.out.println("len = " + len);
 			ba = new byte[len];
 			fos.read(ba);
 			j_temp.fromByteArray(ba);

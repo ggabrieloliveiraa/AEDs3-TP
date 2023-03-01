@@ -49,11 +49,14 @@ public class CRUD {
 		while (posicao < file.length()) {
 			file.seek(posicao);
 			int tamanho = file.readInt();
-			System.out.println("t = " + tamanho);
+            //ba = new byte[tamanho];
+            //file.read(ba);
+            //file.seek(posicao + tamanho + 4);
+            //j_temp.fromByteArray(ba);
+            //System.out.println(j_temp);
 			boolean lapide = file.readBoolean();
-			System.out.println(lapide);
+			//System.out.println(lapide);
 			int registroId = file.readInt();
-			System.out.println("r = " + registroId);
 			if (lapide == false && registroId == id) {
 				System.out.println("!!!!");
 				len = file.readInt();
@@ -62,9 +65,7 @@ public class CRUD {
 				j_temp.fromByteArray(ba);
 				System.out.println(j_temp);
 			}
-			System.out.println("t2 = " + tamanho);
 			posicao += tamanho;
-			System.out.println("p = " + posicao);
 		}
 		return null;
 	}
