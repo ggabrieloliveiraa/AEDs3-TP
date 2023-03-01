@@ -17,7 +17,7 @@ public class Main2 {
 		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
 		byte ba[];
 		int len;
-		Movie j_temp= new Movie();
+		Movie j_temp = new Movie();
 		try {
 
 			RandomAccessFile fos = new RandomAccessFile("arquivo.bin", "rw");
@@ -25,19 +25,25 @@ public class Main2 {
 			for (int i = 0; i < filmes.size(); i++) {
 				System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
-	            fos.writeInt(ba.length); //tamanho do registro em bytes
-	            fos.write(ba); //vetor de bytes que descrevem o objeto
+				fos.writeInt(ba.length); // tamanho do registro em bytes
+				fos.write(ba); // vetor de bytes que descrevem o objeto
 			}
-	        fos.seek(860378);
-	        len = fos.readInt();
-	        ba = new byte[len]; 
-	        fos.read(ba);
-	        j_temp.fromByteArray(ba);
-	        System.out.println(j_temp);
+			fos.seek(600163);
+			len = fos.readInt();
+			ba = new byte[len];
+			fos.read(ba);
+			j_temp.fromByteArray(ba);
+			System.out.println(j_temp);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//readBinary();
+		try {
+			CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+			crud.buscar(5);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// readBinary();
 	}
 
 	public static List<Movie> readCsv(String filename) {
@@ -68,7 +74,6 @@ public class Main2 {
 
 	public static void readBinary() {
 		File file = new File("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
-																					
 
 		try {
 			FileInputStream inputStream = new FileInputStream(file);
