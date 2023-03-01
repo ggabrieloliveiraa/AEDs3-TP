@@ -5,13 +5,13 @@ public class CRUD {
 	private RandomAccessFile file;
 
 	public CRUD(String nomeArquivo) throws IOException {
-		this.file = new RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin", "rw");
+		this.file = new RandomAccessFile(nomeArquivo, "rw");
 	}
 
 	public void fechar() throws IOException {
 		file.close();
 	}
-
+/*
 	public void inserir(Movie movie) throws IOException {
 		// Percorre o arquivo para encontrar um espaço livre grande o suficiente
 		int posicao = 0;
@@ -38,29 +38,42 @@ public class CRUD {
 		file.writeInt(movie.getId());
 		file.writeBytes(movie.getDados());
 	}
+	*/
 
 	public Movie buscar(int id) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 0;
 		int len;
 		byte ba[];
+		Movie j_temp = new Movie();
 		while (posicao < file.length()) {
 			file.seek(posicao);
-			byte lapide = file.readByte();
 			int tamanho = file.readInt();
+			System.out.println(tamanho);
+			//System.out.println(posicao);
+            //ba = new byte[tamanho];
+            //file.read(ba);
+            //file.seek(posicao + tamanho + 4);
+            //j_temp.fromByteArray(ba);
+            //System.out.println(j_temp);
+			boolean lapide = file.readBoolean();
+			//System.out.println(lapide);
+			file.seek(posicao + 4);
 			int registroId = file.readInt();
-			if (lapide == '0' && registroId == id) {
-				len = file.readInt();
-				ba = new byte[len];
+			System.out.println("id = " + registroId);
+			if (lapide == false && registroId == id) {
+				System.out.println("!!!!");
+				file.seek(posicao + 4);
+				ba = new byte[tamanho];
 				file.read(ba);
-				//j_temp.fromByteArray(ba);
-				System.out.println(j_temp);
+				j_temp.fromByteArray(ba);
+				System.out.println(j_temp.title);
+				return j_temp;
 			}
-			posicao += tamanho;
+			posicao += tamanho + 4;
 		}
 		return null;
 	}
-
 	public void atualizar(int id, String novosDados) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 0;
