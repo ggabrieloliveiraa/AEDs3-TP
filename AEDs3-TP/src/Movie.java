@@ -56,7 +56,13 @@ public class Movie {
 		dos.writeUTF(title);
 		dos.writeUTF(director);
 		dos.writeUTF(certificate);
-		dos.writeUTF(genre.toString());
+		dos.writeInt(genre.length);
+		String stringzona = "";
+		for (int i = 0; i < genre.length; i++){
+			stringzona += genre[i];
+			stringzona += ",";
+		}
+		dos.writeUTF(stringzona);
 		dos.writeFloat(rating);
 		dos.writeLong(year.getTime());
 		
@@ -67,12 +73,23 @@ public class Movie {
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(ba);
 		DataInputStream dis = new DataInputStream(bais);
-
+		//boolean fdc = dis.readBoolean();
+		//System.out.println(fdc);
 		id = dis.readInt();
 		title = dis.readUTF();
 		director = dis.readUTF();
 		certificate = dis.readUTF();
-		genre = dis.readUTF().split(",");
+		int quantGen = dis.readInt();
+		String allGen = dis.readUTF();
+		genre = allGen.split(",");
+		/*
+		for(int i = 0; i < quantGen; i++){
+	
+		 genre[i] = dis.readUTF();
+		 genre[i].substring(1);
+		 System.out.println(genre[i]);
+		}
+		*/
 		rating = dis.readFloat();
 		year = new Date(dis.readLong());
 

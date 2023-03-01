@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main2 {
 
@@ -21,13 +22,13 @@ public class Main2 {
 		Movie j_temp = new Movie();
 		try {
 
-			RandomAccessFile fos = new RandomAccessFile("arquivo.bin", "rw");
+			RandomAccessFile fos = new RandomAccessFile("../data/arquivo.bin", "rw");
 
 			for (int i = 0; i < filmes.size(); i++) {
-				System.out.println("Posicao do registro: " + fos.getFilePointer());
+				//System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
 				if(i < 10) {
-				System.out.println(ba.length);
+				//System.out.println(ba.length);
 				}
 				fos.writeInt(ba.length); // tamanho do registro em bytes
 				fos.write(ba); // vetor de bytes que descrevem o objeto
@@ -42,14 +43,125 @@ public class Main2 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		try {
-			CRUD crud = new CRUD("../data/arquivo.bin");
-			crud.buscar(5);
-			crud.fechar();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		interfac();
 		// readBinary();
+	}
+	public static void interfac () {
+		Scanner scanner = new Scanner(System.in);
+		try{
+		CRUD crud = new CRUD("../data/arquivo.bin");
+
+		while (true) {
+            System.out.println("Selecione uma operação:");
+            System.out.println("1 - Listar");
+            System.out.println("2 - Inserir");
+            System.out.println("3 - Atualizar");
+            System.out.println("4 - Excluir");
+            System.out.println("0 - Sair");
+
+			int id = 0;
+			Movie m_temp = new Movie();
+            int opcao = scanner.nextInt();
+            scanner.nextLine(); // limpa o buffer do scanner
+            switch (opcao) {
+                case 1:
+				    System.out.println("Qual ID você deseja mostrar?");
+					id = scanner.nextInt();
+					m_temp = crud.buscar(id);
+                    if (m_temp!=null){
+						System.out.println(m_temp);
+					}
+					else{
+						System.out.println("ERRO: ID não encontrado!");
+					}
+
+                    break;
+                case 2:
+				    crud.inserir(getMovie());
+                    //inserirPessoa(scanner, listaPessoas);
+                    break;
+                case 3:
+				    //crud.atualizar(getMovie());
+					break;
+				case 4:
+					System.out.println("Qual ID você deseja remover?");
+					id = scanner.nextInt();
+					m_temp = crud.remover(id);
+										
+					break;
+				case 0:
+					System.out.println("Saindo...");
+					crud.fechar();
+					return;
+				default:
+					System.out.println("Opção inválida!");
+		}
+	}
+}catch (IOException e){
+		e.printStackTrace();
+	}
+}
+    public byte[] getMovie () {
+		Scanner sc = new Scanner(System.in);
+
+		String title, director;
+		String certificate;
+		String[] genre;
+		float rating;
+		java.util.Date year;
+
+		System.out.println("Digite o título do filme: ");
+		title = Scanner.nextLine();
+		System.out.println("Digite o diretor do filme: ");
+		director = Scanner.nextLine();
+
+		System.out.println("Escolha o certificado de classificação etária para o filme:");
+        System.out.println("1 - A (all ages)");
+        System.out.println("2 - PG-13");
+        System.out.println("3 - R");
+        System.out.println("4 - U");
+        System.out.println("5 - UA");
+
+        int escolha = scanner.nextInt();
+
+        String certificado = " ";
+        switch (escolha) {
+            case 1:
+                certificado = "A";
+                break;
+            case 2:
+                certificado = "PG-13";
+                break;
+            case 3:
+			certificado = "R";
+                break;
+            case 4:
+                certificado = "U";
+                break;
+            case 5:
+                certificado = "UA";
+                break;
+            default:
+                System.out.println("Opção inválida!");
+                break;
+		}
+		dos.writeUTF(certificado);
+
+		System.out.println("Digite quantos gêneros o filmes vai ter");
+		int k = scanner.nextInt();
+
+		for (int i = 0; i < k; i++){
+			System.out.println("Digite o " + i + "º gênero + ENTER");
+			genre[i] = scanner.nextLine;
+		}
+
+		System.out.println("Digite a avaliação do filme, separado por pontos");
+		rating = scanner.nextFloat(); 
+		System.out.println("Digite o ano de lançamento do filme");
+		Date year = new Date();// por enquanto deixei assim(atributos[1])
+		id = 666666;
+		Movie filme = new Movie(false, id, title, year, certificado, genre, rating, director);
+		return filme.toByteArray;
 	}
 
 	public static List<Movie> readCsv(String filename) {

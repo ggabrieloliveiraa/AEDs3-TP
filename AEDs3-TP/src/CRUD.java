@@ -12,15 +12,18 @@ public class CRUD {
 	public void fechar() throws IOException {
 		file.close();
 	}
-/*
+	/*
+
 	public void inserir(Movie movie) throws IOException {
 		// Percorre o arquivo para encontrar um espaço livre grande o suficiente
 		int posicao = 0;
 		while (posicao < file.length()) {
 			file.seek(posicao);
-			byte lapide = file.readByte();
+
 			int tamanho = file.readInt();
-			if (lapide == ' ' && tamanho >= movie.getTamanho()) {
+			byte lapide = file.readByte();
+
+			if (lapide == false && tamanho >= movie.getTamanho()) {
 				// Sobrescreve o movie removido com o novo movie
 				file.seek(posicao);
 				file.writeByte('0');
@@ -39,8 +42,7 @@ public class CRUD {
 		file.writeInt(movie.getId());
 		file.writeBytes(movie.getDados());
 	}
-	*/
-
+*/
 	public Movie buscar(int id) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 0;
@@ -50,7 +52,6 @@ public class CRUD {
 		while (posicao < file.length()) {
 			file.seek(posicao);
 			int tamanho = file.readInt();
-			System.out.println(tamanho);
 			//System.out.println(posicao);
             //ba = new byte[tamanho];
             //file.read(ba);
@@ -58,17 +59,13 @@ public class CRUD {
             //j_temp.fromByteArray(ba);
             //System.out.println(j_temp);
 			boolean lapide = file.readBoolean();
-			//System.out.println(lapide);
 			file.seek(posicao + 4);
 			int registroId = file.readInt();
-			System.out.println("id = " + registroId);
 			if (lapide == false && registroId == id) {
-				System.out.println("!!!!");
 				file.seek(posicao + 4);
 				ba = new byte[tamanho];
 				file.read(ba);
 				j_temp.fromByteArray(ba);
-				System.out.println(j_temp.title);
 				return j_temp;
 			}
 			posicao += tamanho + 4;
@@ -93,21 +90,51 @@ public class CRUD {
 		}
 	}
 
-	public void remover(int id) throws IOException {
+
+
+	public Movie remover(int id) throws IOException {
+		// Percorre o arquivo em busca do movie com o ID especificado
+		int posicao = apontar(id);
+		Movie j_temp = new Movie();
+		byte ba[];
+		file.seek(posicao);
+		int tamanho = file.readInt();
+
+		ba = new byte[tamanho];
+		file.read(ba);
+
+		file.seek(posicao + 4);
+		file.writeBoolean(true); //marca o movie como removido	
+		
+		j_temp.fromByteArray(ba);
+		if (posicao != -1){
+			System.out.println("ITEM REMOVIDO!");
+		} else {
+			System.out.println("ERRO: ITEM NÃO ENCONTRADO");
+		}
+		return j_temp;
+	}
+	/*
+	 * int apontar - aponta pro inicio do registro
+	 * @param int id - id do objeto procurado
+	 * @return int - false = -1 true = posicao
+	 */
+	public int apontar(int id) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 0;
+		int len;
 		while (posicao < file.length()) {
 			file.seek(posicao);
-			byte lapide = file.readByte();
 			int tamanho = file.readInt();
+			boolean lapide = file.readBoolean();
+			file.seek(posicao + 4);
 			int registroId = file.readInt();
-			if (lapide == '0' && registroId == id) {
-				// Marca o movie como removido
-				file.seek(posicao);
-				file.writeByte('*');
-				return;
+			if (lapide == false && registroId == id) {
+				return posicao;
 			}
-			posicao += tamanho;
+			posicao += tamanho + 4;
 		}
+		return -1;
 	}
+
 }
