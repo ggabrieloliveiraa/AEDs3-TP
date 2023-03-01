@@ -9,17 +9,17 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 public class Movie {
-
-	protected int id, metascore;
+	protected boolean lapide;
+	protected int id;
 	protected String title, director;
 	protected String certificate;
 	protected String[] genre;
 	protected float rating;
 	protected java.util.Date year;
 
-	public Movie(String title, Date year, String certificate, String[] genre, float rating, int metascore, String director) {
-		this.id = 0;
-		this.metascore = metascore;
+	public Movie(boolean lapide, int id, String title, Date year, String certificate, String[] genre, float rating, String director) {
+		this.lapide = lapide;
+		this.id = id;
 		this.title = title;
 		this.director = director;
 		this.certificate = certificate;
@@ -30,7 +30,6 @@ public class Movie {
 
 	public Movie() {
 		this.id = -1;
-		this.metascore = -1;
 		this.title = "";
 		this.director = "";
 		this.certificate = "";
@@ -43,7 +42,7 @@ public class Movie {
 
 	@Override
 	public String toString() {
-		return "Movie [id=" + id + ", metascore=" + metascore + ", title=" + title + ", director=" + director
+		return "Movie [id=" + id + ", title=" + title + ", director=" + director
 				+ ", certificate=" + certificate + ", genre=" + Arrays.toString(genre) + ", rating=" + rating
 				+ ", year=" + year + "]";
 	}
@@ -54,7 +53,6 @@ public class Movie {
 		DataOutputStream dos = new DataOutputStream(baos);
 
 		dos.writeInt(id);
-		dos.writeInt(metascore);
 		dos.writeUTF(title);
 		dos.writeUTF(director);
 		dos.writeUTF(certificate);
@@ -71,7 +69,6 @@ public class Movie {
 		DataInputStream dis = new DataInputStream(bais);
 
 		id = dis.readInt();
-		metascore = dis.readInt();
 		title = dis.readUTF();
 		director = dis.readUTF();
 		certificate = dis.readUTF();
