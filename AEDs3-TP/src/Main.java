@@ -46,7 +46,7 @@ public class Main {
 				//Movie filme = new Movie(title, year, certificate, genre, rating, metascore, director);
 				// Faça algo com o objeto
 				try (FileOutputStream fos = new FileOutputStream("./arquivo.bin")) {
-					fos.write(filme.toByteArray());
+					//fos.write(filme.toByteArray());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

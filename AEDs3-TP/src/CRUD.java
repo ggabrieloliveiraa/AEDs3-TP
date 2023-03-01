@@ -45,10 +45,12 @@ public class CRUD {
 		int posicao = 0;
 		int len;
 		byte ba[];
-		Movie j_temp= new Movie();
+		Movie j_temp = new Movie();
 		while (posicao < file.length()) {
 			file.seek(posicao);
 			int tamanho = file.readInt();
+			System.out.println(tamanho);
+			//System.out.println(posicao);
             //ba = new byte[tamanho];
             //file.read(ba);
             //file.seek(posicao + tamanho + 4);
@@ -56,16 +58,19 @@ public class CRUD {
             //System.out.println(j_temp);
 			boolean lapide = file.readBoolean();
 			//System.out.println(lapide);
+			file.seek(posicao + 4);
 			int registroId = file.readInt();
+			System.out.println("id = " + registroId);
 			if (lapide == false && registroId == id) {
 				System.out.println("!!!!");
-				len = file.readInt();
-				ba = new byte[len];
+				file.seek(posicao + 4);
+				ba = new byte[tamanho];
 				file.read(ba);
 				j_temp.fromByteArray(ba);
-				System.out.println(j_temp);
+				System.out.println(j_temp.title);
+				return j_temp;
 			}
-			posicao += tamanho;
+			posicao += tamanho + 4;
 		}
 		return null;
 	}
