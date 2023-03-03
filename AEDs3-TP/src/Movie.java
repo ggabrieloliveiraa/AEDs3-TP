@@ -1,12 +1,10 @@
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.io.IOException;
-import java.text.DecimalFormat;
 
 public class Movie {
 	protected boolean lapide;

@@ -1,16 +1,12 @@
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Calendar;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main2 {
@@ -46,6 +42,7 @@ public class Main2 {
 		interfac();
 		// readBinary();
 	}
+
 	public static void interfac () {
 		Scanner scanner = new Scanner(System.in);
 		try{
@@ -77,7 +74,9 @@ public class Main2 {
 
                     break;
                 case 2:
-				    crud.inserir(getMovie());
+					m_temp = getMovie();
+
+				    crud.inserir(m_temp.toByteArray());
                     //inserirPessoa(scanner, listaPessoas);
                     break;
                 case 3:
@@ -101,19 +100,23 @@ public class Main2 {
 		e.printStackTrace();
 	}
 }
-    public byte[] getMovie () {
+
+
+    public static Movie getMovie () {
 		Scanner sc = new Scanner(System.in);
 
+		
 		String title, director;
-		String certificate;
-		String[] genre;
+		
 		float rating;
-		java.util.Date year;
+		//java.util.Date year;
+		int id = 0;
 
 		System.out.println("Digite o título do filme: ");
-		title = Scanner.nextLine();
+		title = sc.nextLine();
+
 		System.out.println("Digite o diretor do filme: ");
-		director = Scanner.nextLine();
+		director = sc.nextLine();
 
 		System.out.println("Escolha o certificado de classificação etária para o filme:");
         System.out.println("1 - A (all ages)");
@@ -122,7 +125,7 @@ public class Main2 {
         System.out.println("4 - U");
         System.out.println("5 - UA");
 
-        int escolha = scanner.nextInt();
+        int escolha = sc.nextInt();
 
         String certificado = " ";
         switch (escolha) {
@@ -145,24 +148,31 @@ public class Main2 {
                 System.out.println("Opção inválida!");
                 break;
 		}
-		dos.writeUTF(certificado);
 
 		System.out.println("Digite quantos gêneros o filmes vai ter");
-		int k = scanner.nextInt();
+		int k = sc.nextInt();
+
+		String[] genre = new String[k];
 
 		for (int i = 0; i < k; i++){
 			System.out.println("Digite o " + i + "º gênero + ENTER");
-			genre[i] = scanner.nextLine;
+			genre[i] = sc.nextLine();
 		}
 
-		System.out.println("Digite a avaliação do filme, separado por pontos");
-		rating = scanner.nextFloat(); 
+		System.out.println("Digite a avaliação do filme, separado por vírgula");
+		rating = sc.nextFloat(); 
+
 		System.out.println("Digite o ano de lançamento do filme");
+		int date = sc.nextInt();
 		Date year = new Date();// por enquanto deixei assim(atributos[1])
 		id = 666666;
+
 		Movie filme = new Movie(false, id, title, year, certificado, genre, rating, director);
-		return filme.toByteArray;
+	
+		return filme;
+		
 	}
+
 
 	public static List<Movie> readCsv(String filename) {
 		List<Movie> filmes = new ArrayList<>();

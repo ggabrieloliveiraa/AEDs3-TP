@@ -12,37 +12,73 @@ public class CRUD {
 	public void fechar() throws IOException {
 		file.close();
 	}
-	/*
+	
 
-	public void inserir(Movie movie) throws IOException {
+	public void inserir(byte[] ba) throws IOException {
 		// Percorre o arquivo para encontrar um espaço livre grande o suficiente
 		int posicao = 0;
-		while (posicao < file.length()) {
+		int tmp = 0;
+
+		Movie j_temp = new Movie();
+		j_temp.fromByteArray(ba);
+
+		System.out.println("entrou no inseriir");
+		while (file.getFilePointer() < file.length()) {
 			file.seek(posicao);
 
 			int tamanho = file.readInt();
-			byte lapide = file.readByte();
+			System.out.println(tamanho);
+			boolean lapide = file.readBoolean();
 
-			if (lapide == false && tamanho >= movie.getTamanho()) {
+			if (tamanho >= ba.length && lapide == true){//se tiver uma lapide com espaço o suficiente
 				// Sobrescreve o movie removido com o novo movie
-				file.seek(posicao);
-				file.writeByte('0');
-				file.writeInt(movie.getTamanho());
-				file.writeInt(movie.getId());
-				file.writeBytes(movie.getDados());
+				file.seek(posicao + 4);
+				file.writeBoolean(false);
+				file.seek(file.getFilePointer() + 4);//pulando o iid pra deixar o mesmo
+				file.writeUTF(j_temp.title);
+				file.writeUTF(j_temp.director);
+				file.writeUTF(j_temp.certificate);
+				file.writeInt(j_temp.genre.length);
+				String stringzona = "";
+				for (int i = 0; i < j_temp.genre.length; i++){
+					stringzona += j_temp.genre[i];
+					stringzona += ",";
+				}
+				file.writeUTF(stringzona);
+				file.writeFloat(j_temp.rating);
+				file.writeLong(j_temp.year.getTime());
+
+
 				return;
 			}
-			posicao += tamanho;
+
+			posicao += tamanho + 4;
+			tmp++;
+			System.out.println("id = " + tmp);
 		}
 
 		// Se não encontrar espaço livre, adiciona o movie ao final do arquivo
-		file.seek(file.length());
-		file.writeByte('0');
-		file.writeInt(movie.getTamanho());
-		file.writeInt(movie.getId());
-		file.writeBytes(movie.getDados());
+
+		file.writeInt(ba.length);
+		file.writeBoolean(false);
+		file.writeInt(tmp);
+		file.writeUTF(j_temp.title);
+		file.writeUTF(j_temp.director);
+		file.writeUTF(j_temp.certificate);
+		file.writeInt(j_temp.genre.length);
+		String stringzona = "";
+		for (int i = 0; i < j_temp.genre.length; i++){
+			stringzona += j_temp.genre[i];
+			stringzona += ",";
+		}
+		file.writeUTF(stringzona);
+		file.writeFloat(j_temp.rating);
+		file.writeLong(j_temp.year.getTime());
+
+		System.out.println("acabou");
+
 	}
-*/
+
 	public Movie buscar(int id) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 0;
