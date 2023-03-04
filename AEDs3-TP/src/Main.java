@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main2 {
+public class Main {
 
 	public static void main(String[] args) {
 		List<Movie> filmes = readCsv("../data/movies.csv");
@@ -29,13 +29,13 @@ public class Main2 {
 				fos.writeInt(ba.length); // tamanho do registro em bytes
 				fos.write(ba); // vetor de bytes que descrevem o objeto
 			}
-			fos.seek(860381);
+			/*fos.seek(860381);
 			len = fos.readInt();
 			System.out.println("len = " + len);
 			ba = new byte[len];
 			fos.read(ba);
 			j_temp.fromByteArray(ba);
-			System.out.println(j_temp);
+			System.out.println(j_temp);*/
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -62,6 +62,8 @@ public class CRUD {
 		file.writeInt(ba.length);
 		file.writeBoolean(false);
 		file.writeInt(tmp);
+		
+
 		file.writeUTF(j_temp.title);
 		file.writeUTF(j_temp.director);
 		file.writeUTF(j_temp.certificate);
@@ -74,6 +76,9 @@ public class CRUD {
 		file.writeUTF(stringzona);
 		file.writeFloat(j_temp.rating);
 		file.writeLong(j_temp.year.getTime());
+
+		System.out.println(j_temp);
+		System.out.println(tmp);
 
 		System.out.println("acabou");
 
