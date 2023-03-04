@@ -15,7 +15,8 @@ public class Movie {
 	protected float rating;
 	protected java.util.Date year;
 
-	public Movie(boolean lapide, int id, String title, Date year, String certificate, String[] genre, float rating, String director) {
+	public Movie(boolean lapide, int id, String title, Date year, String certificate, String[] genre, float rating,
+			String director) {
 		this.lapide = lapide;
 		this.id = id;
 		this.title = title;
@@ -35,8 +36,6 @@ public class Movie {
 		this.rating = 0F;
 		this.year = null;
 	}
-	
-
 
 	@Override
 	public String toString() {
@@ -56,14 +55,14 @@ public class Movie {
 		dos.writeUTF(certificate);
 		dos.writeInt(genre.length);
 		String stringzona = "";
-		for (int i = 0; i < genre.length; i++){
+		for (int i = 0; i < genre.length; i++) {
 			stringzona += genre[i];
 			stringzona += ",";
 		}
 		dos.writeUTF(stringzona);
 		dos.writeFloat(rating);
 		dos.writeLong(year.getTime());
-		
+
 		return baos.toByteArray();
 	}
 
@@ -71,8 +70,8 @@ public class Movie {
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(ba);
 		DataInputStream dis = new DataInputStream(bais);
-		//boolean fdc = dis.readBoolean();
-		//System.out.println(fdc);
+		// boolean fdc = dis.readBoolean();
+		// System.out.println(fdc);
 		id = dis.readInt();
 		title = dis.readUTF();
 		director = dis.readUTF();
@@ -81,13 +80,13 @@ public class Movie {
 		String allGen = dis.readUTF();
 		genre = allGen.split(",");
 		/*
-		for(int i = 0; i < quantGen; i++){
-	
-		 genre[i] = dis.readUTF();
-		 genre[i].substring(1);
-		 System.out.println(genre[i]);
-		}
-		*/
+		 * for(int i = 0; i < quantGen; i++){
+		 * 
+		 * genre[i] = dis.readUTF();
+		 * genre[i].substring(1);
+		 * System.out.println(genre[i]);
+		 * }
+		 */
 		rating = dis.readFloat();
 		year = new Date(dis.readLong());
 
