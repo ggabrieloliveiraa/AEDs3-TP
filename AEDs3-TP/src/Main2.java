@@ -44,6 +44,7 @@ public class Main2 {
 		try {
 			CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
 			crud.buscar(5);
+			crud.fechar();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
