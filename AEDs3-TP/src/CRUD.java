@@ -352,7 +352,7 @@ public class CRUD {
 	public void cargaInicial() {
 		// RandomAccessFile fos = new
 		// RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", rw");
-		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
+		List<Movie> filmes = readCsv("../data/movies.csv");
 		byte ba[];
 		try {
 			if (file.length() == 0) {
@@ -375,7 +375,7 @@ public class CRUD {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return;
 	}
 
 	/*
