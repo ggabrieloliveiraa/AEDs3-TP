@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -14,9 +16,14 @@ public class CRUD {
 		file.close();
 	}
 
+	public int getMaxId() throws IOException {
+		file.seek(0);
+		return (file.readInt());
+	}
+
 	public void inserir(byte[] ba) throws IOException {
 		// variaveis que vao ser usadas para posicionar e id
-		int posicao = 0;
+		int posicao = 4;
 		int tmp = 0;
 		int tamanho = 0;
 
@@ -50,13 +57,15 @@ public class CRUD {
 			tmp++;
 		}
 
-		j_temp.id = tmp;
+		j_temp.id = getMaxId() + 1;
 
 		file.seek(posicao);
 		file.writeInt(ba.length);// escrever o tamanho
 
 		byte[] arr = j_temp.toByteArray();
 		file.write(arr);
+		file.seek(0);
+		file.writeInt(tmp);
 
 		System.out.println("filme adicionado na posicao: " + j_temp.id);
 		return;
@@ -126,134 +135,120 @@ public class CRUD {
 			sc.nextLine(); // limpa o buffer do scanner
 			switch (opcao) {
 
+			case 1:
+				System.out.println("Novo título: ");
+				tmp = sc.nextLine();
+
+				j_temp.title = tmp;
+
+				break;
+
+			case 2:
+				System.out.println("Novo diretor: ");
+				tmp = sc.nextLine();
+
+				j_temp.director = tmp;
+
+				break;
+
+			case 3:
+				System.out.println("Escolha o certificado de classificação etária para o filme:");
+				System.out.println("1 - A (all ages)");
+				System.out.println("2 - PG-13");
+				System.out.println("3 - R");
+				System.out.println("4 - U");
+				System.out.println("5 - UA");
+
+				int escolha = sc.nextInt();
+				switch (escolha) {
 				case 1:
-					System.out.println("Novo título: ");
-					tmp = sc.nextLine();
-
-					remover(id);
-					j_temp.title = tmp;
-					inserir(j_temp.toByteArray());
-
+					tmp = "A";
 					break;
-
 				case 2:
-					System.out.println("Novo diretor: ");
-					tmp = sc.nextLine();
-
-					remover(id);
-					j_temp.director = tmp;
-					inserir(j_temp.toByteArray());
-
+					tmp = "PG-13";
 					break;
-
 				case 3:
-					System.out.println("Escolha o certificado de classificação etária para o filme:");
-					System.out.println("1 - A (all ages)");
-					System.out.println("2 - PG-13");
-					System.out.println("3 - R");
-					System.out.println("4 - U");
-					System.out.println("5 - UA");
-
-					int escolha = sc.nextInt();
-					switch (escolha) {
-						case 1:
-							tmp = "A";
-							break;
-						case 2:
-							tmp = "PG-13";
-							break;
-						case 3:
-							tmp = "R";
-							break;
-						case 4:
-							tmp = "U";
-							break;
-						case 5:
-							tmp = "UA";
-							break;
-						default:
-							System.out.println("Opção inválida!");
-							// break;
-					}
-
-					remover(id);
-					j_temp.certificate = tmp;
-					inserir(j_temp.toByteArray());
-
+					tmp = "R";
 					break;
-
 				case 4:
-					// ler os generos
-					System.out.println("Digite quantos gêneros o filmes vai ter");
-					int k = sc.nextInt();
-					int size = 0;
-
-					String[] genre = new String[k];
-					sc.nextLine();
-					for (int i = 0; i < k; i++) {
-						System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
-						genre[i] = sc.nextLine();
-						size += genre[i].length();
-					}
-
-					// verificar se cabe
-					file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-							+ j_temp.certificate.length());
-
-					remover(id);
-					j_temp.genre = genre;
-					inserir(j_temp.toByteArray());
-
+					tmp = "U";
 					break;
-
 				case 5:
-					float rating;
-					System.out.println("Digite a avaliação do filme, separado por vírgula");
-					rating = sc.nextFloat();
-
-					file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-							+ j_temp.certificate.length());
-
-					temp = file.readInt();// pegar o tamanho do array de generos
-					temp2 = 0;
-					for (int i = 0; 0 < temp; i++) {
-						temp2 += file.readUTF().length();
-					}
-
-					file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-							+ j_temp.certificate.length() + 4 + temp2);
-
-					j_temp.rating = rating;
-					file.writeFloat(rating);
-
+					tmp = "UA";
 					break;
-
-				case 6:
-					System.out.println("Digite o ano de lançamento do filme");
-					int date = sc.nextInt();
-
-					Date year = new Date();// por enquanto deixei assim(atributos[1])
-
-					file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-							+ j_temp.certificate.length());
-
-					temp = file.readInt();// pegar o tamanho do array de generos
-					temp2 = 0;
-					for (int i = 0; 0 < temp; i++) {
-						temp2 += file.readUTF().length();
-					}
-
-					file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-							+ j_temp.certificate.length() + 4 + temp2);
-
-					file.writeLong(year.getTime());
-					break;
-
-				case 0:
-					System.out.println("Saindo...");
-					return;
 				default:
 					System.out.println("Opção inválida!");
+					// break;
+				}
+
+				j_temp.certificate = tmp;
+
+				break;
+
+			case 4:
+				// ler os generos
+				System.out.println("Digite quantos gêneros o filmes vai ter");
+				int k = sc.nextInt();
+				int size = 0;
+
+				String[] genre = new String[k];
+				sc.nextLine();
+				for (int i = 0; i < k; i++) {
+					System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
+					genre[i] = sc.nextLine();
+					size += genre[i].length();
+				}
+
+				// verificar se cabe
+				file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() + j_temp.certificate.length());
+
+				j_temp.genre = genre;
+
+				break;
+
+			case 5:
+				float rating;
+				System.out.println("Digite a avaliação do filme, separado por vírgula");
+				rating = sc.nextFloat();
+				/*
+				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+				 * j_temp.certificate.length()); temp = file.readInt();// pegar o tamanho do
+				 * array de generos temp2 = 0; for (int i = 0; 0 < temp; i++) { temp2 +=
+				 * file.readUTF().length(); }
+				 * 
+				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+				 * j_temp.certificate.length() + 4 + temp2);
+				 * 
+				 * j_temp.rating = rating; file.writeFloat(rating);
+				 */
+				j_temp.rating = rating;
+				break;
+
+			case 6:
+				System.out.println("Digite o ano de lançamento do filme");
+				int date = sc.nextInt();
+
+				Date year = new Date();// por enquanto deixei assim(atributos[1])
+				/*
+				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+				 * j_temp.certificate.length());
+				 * 
+				 * temp = file.readInt();// pegar o tamanho do array de generos temp2 = 0; for
+				 * (int i = 0; 0 < temp; i++) { temp2 += file.readUTF().length(); }
+				 * 
+				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+				 * j_temp.certificate.length() + 4 + temp2); file.writeLong(year.getTime());
+				 */
+				j_temp.year = year;
+				break;
+
+			case 0:
+				remover(id);
+				inserir(j_temp.toByteArray());
+				System.out.println("Saindo...");
+				return;
+			default:
+				System.out.println("Opção inválida!");
 			}
 		}
 
@@ -292,7 +287,7 @@ public class CRUD {
 	 */
 	public int apontar(int id) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
-		int posicao = 0;
+		int posicao = 4;
 		int len;
 		while (posicao < file.length()) {
 			file.seek(posicao);
@@ -310,7 +305,7 @@ public class CRUD {
 
 	public int apontar(String title) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
-		int posicao = 0;
+		int posicao = 4;
 		int len;
 		String registroTitle = "";
 		while (posicao < file.length()) {
@@ -328,54 +323,86 @@ public class CRUD {
 		return -1;
 	}
 
+	public static List<Movie> readCsv(String filename) {
+		List<Movie> filmes = new ArrayList<>();
+		int id = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
+			String line;
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+				String[] atributos = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+				// o regex acima divide a linha em campos, ignorando as vírgulas entre aspas
+				String title = atributos[0];
+				Date year = new Date();// por enquanto deixei assim(atributos[1])
+				String certificate = atributos[2];
+				String[] genre = atributos[3].replaceAll("^\"|\"$", "").split(",");
+				float rating = Float.parseFloat(atributos[4]);
+				String director = atributos[5];
+				Movie filme = new Movie(false, id, title, year, certificate, genre, rating, director);
+				id++;
+				filmes.add(filme);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return filmes;
+	}
+
+	public void cargaInicial() {
+		// RandomAccessFile fos = new
+		// RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", rw");
+		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
+		byte ba[];
+		try {
+			if (file.length() == 0) {
+				file.seek(0);
+				file.writeInt(filmes.size() - 1); // cabaço
+			}
+			else {
+			file.seek(4);
+			}
+			for (int i = 0; i < filmes.size(); i++) {
+				// System.out.println("Posicao do registro: " + fos.getFilePointer());
+				ba = filmes.get(i).toByteArray();
+				if (i < 10) {
+					// System.out.println(ba.length);
+				}
+				file.writeInt(ba.length); // escreve tamanho da entidade
+				file.write(ba); // escreve o byte de arrays da entidade
+				// inserir(ba);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/*
-	 * public Movie buscar(int id) throws IOException {
-	 * // Percorre o arquivo em busca do movie com o ID especificado
-	 * int posicao = 0;
-	 * int len;
-	 * byte ba[];
-	 * Movie j_temp = new Movie();
-	 * while (posicao < file.length()) {
-	 * file.seek(posicao);
-	 * int tamanho = file.readInt();
-	 * // System.out.println(posicao);
-	 * // ba = new byte[tamanho];
-	 * // file.read(ba);
-	 * // file.seek(posicao + tamanho + 4);
-	 * // j_temp.fromByteArray(ba);
-	 * // System.out.println(j_temp);
-	 * boolean lapide = file.readBoolean();
-	 * file.seek(posicao + 4);
-	 * int registroId = file.readInt();
-	 * if (lapide == false && registroId == id) {
-	 * file.seek(posicao + 4);
-	 * ba = new byte[tamanho];
-	 * file.read(ba);
-	 * j_temp.fromByteArray(ba);
-	 * return j_temp;
-	 * }
-	 * posicao += tamanho + 4;
-	 * }
-	 * return null;
-	 * }
+	 * public Movie buscar(int id) throws IOException { // Percorre o arquivo em
+	 * busca do movie com o ID especificado int posicao = 4; int len; byte ba[];
+	 * Movie j_temp = new Movie(); while (posicao < file.length()) {
+	 * file.seek(posicao); int tamanho = file.readInt(); //
+	 * System.out.println(posicao); // ba = new byte[tamanho]; // file.read(ba); //
+	 * file.seek(posicao + tamanho + 4); // j_temp.fromByteArray(ba); //
+	 * System.out.println(j_temp); boolean lapide = file.readBoolean();
+	 * file.seek(posicao + 4); int registroId = file.readInt(); if (lapide == false
+	 * && registroId == id) { file.seek(posicao + 4); ba = new byte[tamanho];
+	 * file.read(ba); j_temp.fromByteArray(ba); return j_temp; } posicao += tamanho
+	 * + 4; } return null; }
 	 */
 
 	/*
-	 * public void atualizar(int id) throws IOException {
-	 * Scanner sc = new Scanner(System.in);
-	 * int posicao = apontar(id);
-	 * int temp = 0;
-	 * int temp2 = 0;
+	 * public void atualizar(int id) throws IOException { Scanner sc = new
+	 * Scanner(System.in); int posicao = apontar(id); int temp = 0; int temp2 = 0;
 	 * String tmp = "";
 	 * 
-	 * // Percorre o arquivo em busca do movie com o ID especificado
-	 * Movie j_temp = new Movie();
-	 * j_temp = buscar(id);
+	 * // Percorre o arquivo em busca do movie com o ID especificado Movie j_temp =
+	 * new Movie(); j_temp = buscar(id);
 	 * 
 	 * System.out.println("qual atributo do filme voce deseja atualizar?");
 	 * 
-	 * while (true) {
-	 * System.out.println("Selecione um atributo:");
+	 * while (true) { System.out.println("Selecione um atributo:");
 	 * System.out.println("1 - Título = " + j_temp.title);
 	 * System.out.println("2 - Diretor = " + j_temp.director);
 	 * System.out.println("3 - Certificado = " + j_temp.certificate);
@@ -384,200 +411,107 @@ public class CRUD {
 	 * System.out.println("6 - Ano Lançamento = " + j_temp.year);
 	 * System.out.println("0 - Sair");
 	 * 
-	 * int opcao = sc.nextInt();
-	 * sc.nextLine(); // limpa o buffer do scanner
-	 * switch (opcao) {
+	 * int opcao = sc.nextInt(); sc.nextLine(); // limpa o buffer do scanner switch
+	 * (opcao) {
 	 * 
-	 * case 1:
-	 * System.out.println("Novo título: ");
-	 * tmp = sc.nextLine();
+	 * case 1: System.out.println("Novo título: "); tmp = sc.nextLine();
 	 * 
-	 * // verificar se cabe
-	 * if (j_temp.title.length() > tmp.length()) {
-	 * temp2 = tmp.length();
-	 * for (temp = 0; temp < j_temp.title.length() - temp2; temp++) {
-	 * tmp += " ";
-	 * }
-	 * j_temp.title = tmp;
-	 * file.seek(posicao + 8);
-	 * file.writeUTF(tmp);
-	 * buscar(10061);
-	 * System.out.println(j_temp);
-	 * } else {
-	 * remover(id);
-	 * j_temp.title = tmp;
-	 * inserir(j_temp.toByteArray());
-	 * }
-	 * break;
+	 * // verificar se cabe if (j_temp.title.length() > tmp.length()) { temp2 =
+	 * tmp.length(); for (temp = 0; temp < j_temp.title.length() - temp2; temp++) {
+	 * tmp += " "; } j_temp.title = tmp; file.seek(posicao + 8); file.writeUTF(tmp);
+	 * buscar(10061); System.out.println(j_temp); } else { remover(id); j_temp.title
+	 * = tmp; inserir(j_temp.toByteArray()); } break;
 	 * 
-	 * case 2:
-	 * System.out.println("Novo diretor: ");
-	 * tmp = sc.nextLine();
+	 * case 2: System.out.println("Novo diretor: "); tmp = sc.nextLine();
 	 * 
-	 * // verificar se cabe
-	 * if (j_temp.director.length() > tmp.length()) {
-	 * temp2 = tmp.length();
-	 * for (temp = 0; temp < j_temp.title.length() - temp2; temp++) {
-	 * tmp += " ";
-	 * }
-	 * j_temp.director = tmp;
-	 * file.seek(posicao + 9 + j_temp.title.length());
-	 * file.writeUTF(tmp);
-	 * } else {
-	 * remover(id);
-	 * j_temp.director = tmp;
-	 * inserir(j_temp.toByteArray());
-	 * }
-	 * break;
+	 * // verificar se cabe if (j_temp.director.length() > tmp.length()) { temp2 =
+	 * tmp.length(); for (temp = 0; temp < j_temp.title.length() - temp2; temp++) {
+	 * tmp += " "; } j_temp.director = tmp; file.seek(posicao + 9 +
+	 * j_temp.title.length()); file.writeUTF(tmp); } else { remover(id);
+	 * j_temp.director = tmp; inserir(j_temp.toByteArray()); } break;
 	 * 
-	 * case 3:
-	 * System.out.
+	 * case 3: System.out.
 	 * println("Escolha o certificado de classificação etária para o filme:");
-	 * System.out.println("1 - A (all ages)");
-	 * System.out.println("2 - PG-13");
-	 * System.out.println("3 - R");
-	 * System.out.println("4 - U");
+	 * System.out.println("1 - A (all ages)"); System.out.println("2 - PG-13");
+	 * System.out.println("3 - R"); System.out.println("4 - U");
 	 * System.out.println("5 - UA");
 	 * 
-	 * int escolha = sc.nextInt();
-	 * switch (escolha) {
-	 * case 1:
-	 * tmp = "A";
-	 * break;
-	 * case 2:
-	 * tmp = "PG-13";
-	 * break;
-	 * case 3:
-	 * tmp = "R";
-	 * break;
-	 * case 4:
-	 * tmp = "U";
-	 * break;
-	 * case 5:
-	 * tmp = "UA";
-	 * break;
-	 * default:
-	 * System.out.println("Opção inválida!");
-	 * // break;
-	 * }
+	 * int escolha = sc.nextInt(); switch (escolha) { case 1: tmp = "A"; break; case
+	 * 2: tmp = "PG-13"; break; case 3: tmp = "R"; break; case 4: tmp = "U"; break;
+	 * case 5: tmp = "UA"; break; default: System.out.println("Opção inválida!"); //
+	 * break; }
 	 * 
-	 * // verificar se cabe
-	 * if (j_temp.certificate.length() > tmp.length()) {
-	 * j_temp.certificate = tmp;
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length());
-	 * temp2 = tmp.length();
-	 * for (temp = 0; temp < j_temp.title.length() - temp2; temp++) {
-	 * tmp += " ";
-	 * }
-	 * file.writeUTF(tmp);
-	 * } else {
-	 * remover(id);
-	 * j_temp.certificate = tmp;
-	 * inserir(j_temp.toByteArray());
-	 * }
-	 * break;
+	 * // verificar se cabe if (j_temp.certificate.length() > tmp.length()) {
+	 * j_temp.certificate = tmp; file.seek(posicao + 9 + j_temp.title.length() +
+	 * j_temp.director.length()); temp2 = tmp.length(); for (temp = 0; temp <
+	 * j_temp.title.length() - temp2; temp++) { tmp += " "; } file.writeUTF(tmp); }
+	 * else { remover(id); j_temp.certificate = tmp; inserir(j_temp.toByteArray());
+	 * } break;
 	 * 
-	 * case 4:
-	 * // ler os generos
-	 * System.out.println("Digite quantos gêneros o filmes vai ter");
-	 * int k = sc.nextInt();
-	 * int size = 0;
+	 * case 4: // ler os generos
+	 * System.out.println("Digite quantos gêneros o filmes vai ter"); int k =
+	 * sc.nextInt(); int size = 0;
 	 * 
-	 * String[] genre = new String[k];
-	 * sc.nextLine();
-	 * for (int i = 0; i < k; i++) {
-	 * System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
-	 * genre[i] = sc.nextLine();
-	 * size += genre[i].length();
-	 * }
+	 * String[] genre = new String[k]; sc.nextLine(); for (int i = 0; i < k; i++) {
+	 * System.out.println("Digite o " + (i + 1) + "º gênero + ENTER"); genre[i] =
+	 * sc.nextLine(); size += genre[i].length(); }
 	 * 
-	 * // verificar se cabe
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-	 * + j_temp.certificate.length());
+	 * // verificar se cabe file.seek(posicao + 9 + j_temp.title.length() +
+	 * j_temp.director.length() + j_temp.certificate.length());
 	 * 
 	 * temp = file.readInt();// pegar o tamanho do array de generos
 	 * 
-	 * temp2 = 0;
-	 * for (int i = 0; 0 < temp; i++) {
-	 * temp2 += file.readUTF().length();
-	 * }
-	 * if (temp2 > size) {
+	 * temp2 = 0; for (int i = 0; 0 < temp; i++) { temp2 += file.readUTF().length();
+	 * } if (temp2 > size) {
 	 * 
-	 * temp2 = tmp.length();
-	 * for (temp = 0; temp < j_temp.title.length() - temp2; temp++) {
-	 * tmp += " ";
-	 * }
+	 * temp2 = tmp.length(); for (temp = 0; temp < j_temp.title.length() - temp2;
+	 * temp++) { tmp += " "; }
 	 * 
-	 * j_temp.genre = genre;
-	 * // posicionar no local dos generos
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-	 * + j_temp.certificate.length());
+	 * j_temp.genre = genre; // posicionar no local dos generos file.seek(posicao +
+	 * 9 + j_temp.title.length() + j_temp.director.length() +
+	 * j_temp.certificate.length());
 	 * 
 	 * // escrever a quantidade de generos que vai ser inserida
-	 * file.writeInt(genre.length);
-	 * String stringzona = "";
-	 * for (int i = 0; i < genre.length; i++) {
-	 * stringzona += genre[i];
-	 * stringzona += ",";
-	 * }
-	 * file.writeUTF(stringzona);
-	 * } else {
-	 * remover(id);
-	 * j_temp.genre = genre;
-	 * inserir(j_temp.toByteArray());
-	 * }
-	 * break;
+	 * file.writeInt(genre.length); String stringzona = ""; for (int i = 0; i <
+	 * genre.length; i++) { stringzona += genre[i]; stringzona += ","; }
+	 * file.writeUTF(stringzona); } else { remover(id); j_temp.genre = genre;
+	 * inserir(j_temp.toByteArray()); } break;
 	 * 
-	 * case 5:
-	 * float rating;
+	 * case 5: float rating;
 	 * System.out.println("Digite a avaliação do filme, separado por vírgula");
 	 * rating = sc.nextFloat();
 	 * 
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-	 * + j_temp.certificate.length());
+	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+	 * j_temp.certificate.length());
 	 * 
-	 * temp = file.readInt();// pegar o tamanho do array de generos
-	 * temp2 = 0;
-	 * for (int i = 0; 0 < temp; i++) {
-	 * temp2 += file.readUTF().length();
-	 * }
+	 * temp = file.readInt();// pegar o tamanho do array de generos temp2 = 0; for
+	 * (int i = 0; 0 < temp; i++) { temp2 += file.readUTF().length(); }
 	 * 
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-	 * + j_temp.certificate.length() + 4 + temp2);
+	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+	 * j_temp.certificate.length() + 4 + temp2);
 	 * 
-	 * j_temp.rating = rating;
-	 * file.writeFloat(rating);
+	 * j_temp.rating = rating; file.writeFloat(rating);
 	 * 
 	 * break;
 	 * 
-	 * case 6:
-	 * System.out.println("Digite o ano de lançamento do filme");
-	 * int date = sc.nextInt();
+	 * case 6: System.out.println("Digite o ano de lançamento do filme"); int date =
+	 * sc.nextInt();
 	 * 
 	 * Date year = new Date();// por enquanto deixei assim(atributos[1])
 	 * 
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-	 * + j_temp.certificate.length());
+	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+	 * j_temp.certificate.length());
 	 * 
-	 * temp = file.readInt();// pegar o tamanho do array de generos
-	 * temp2 = 0;
-	 * for (int i = 0; 0 < temp; i++) {
-	 * temp2 += file.readUTF().length();
-	 * }
+	 * temp = file.readInt();// pegar o tamanho do array de generos temp2 = 0; for
+	 * (int i = 0; 0 < temp; i++) { temp2 += file.readUTF().length(); }
 	 * 
-	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-	 * + j_temp.certificate.length() + 4 + temp2);
+	 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
+	 * j_temp.certificate.length() + 4 + temp2);
 	 * 
-	 * file.writeLong(year.getTime());
-	 * break;
+	 * file.writeLong(year.getTime()); break;
 	 * 
-	 * case 0:
-	 * System.out.println("Saindo...");
-	 * return;
-	 * default:
-	 * System.out.println("Opção inválida!");
-	 * }
-	 * }
+	 * case 0: System.out.println("Saindo..."); return; default:
+	 * System.out.println("Opção inválida!"); } }
 	 * 
 	 * }
 	 */

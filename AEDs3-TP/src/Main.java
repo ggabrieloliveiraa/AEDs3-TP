@@ -12,39 +12,7 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-		List<Movie> filmes = readCsv("../data/movies.csv");
-		byte ba[];
-		int len;
-		Movie j_temp = new Movie();
-		try {
-
-			RandomAccessFile fos = new RandomAccessFile("../data/arquivo.bin", "rw");
-
-			for (int i = 0; i < filmes.size(); i++) {
-				// System.out.println("Posicao do registro: " + fos.getFilePointer());
-				ba = filmes.get(i).toByteArray();
-				if (i < 10) {
-					// System.out.println(ba.length);
-				}
-
-				fos.writeInt(ba.length); // tamanho do registro em bytes
-
-				fos.write(ba); // vetor de bytes que descrevem o objeto
-			}
-			/*
-			 * fos.seek(860381);
-			 * len = fos.readInt();
-			 * System.out.println("len = " + len);
-			 * ba = new byte[len];
-			 * fos.read(ba);
-			 * j_temp.fromByteArray(ba);
-			 * System.out.println(j_temp);
-			 */
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		interfac();
-		// readBinary();
 	}
 
 	public static void interfac() {
@@ -58,6 +26,7 @@ public class Main {
 				System.out.println("2 - Inserir");
 				System.out.println("3 - Atualizar");
 				System.out.println("4 - Excluir");
+				System.out.println("5 - Carga inicial");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -75,6 +44,7 @@ public class Main {
 						scanner.nextLine(); // limpa o buffer do scanner
 						switch (opco) {
 							case 1:
+								System.out.println("Maior ID = " + crud.getMaxId());
 								System.out.println("Qual ID você deseja mostrar?");
 								id = scanner.nextInt();
 								m_temp = crud.buscar(id);
@@ -114,7 +84,10 @@ public class Main {
 						System.out.println("Qual ID você deseja remover?");
 						id = scanner.nextInt();
 						m_temp = crud.remover(id);
-
+					case 5:
+						crud.cargaInicial();
+						System.out.println("Carga inicial realizada!");
+						System.out.println("Maior ID = " + crud.getMaxId());
 						break;
 					case 0:
 						System.out.println("Saindo...");
@@ -192,57 +165,11 @@ public class Main {
 		System.out.println("Digite o ano de lançamento do filme");
 		int date = sc.nextInt();
 		Date year = new Date();// por enquanto deixei assim(atributos[1])
-		id = 10064;
+		//id = 10064;
 
 		Movie filme = new Movie(false, id, title, year, certificado, genre, rating, director);
 
 		return filme;
-
-	}
-
-	public static List<Movie> readCsv(String filename) {
-		List<Movie> filmes = new ArrayList<>();
-		int id = 0;
-		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
-			String line;
-			while ((line = br.readLine()) != null) {
-				System.out.println(line);
-				String[] atributos = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-				// o regex acima divide a linha em campos, ignorando as vírgulas entre aspas
-				String title = atributos[0];
-				Date year = new Date();// por enquanto deixei assim(atributos[1])
-				String certificate = atributos[2];
-				String[] genre = atributos[3].replaceAll("^\"|\"$", "").split(",");
-				float rating = Float.parseFloat(atributos[4]);
-				String director = atributos[5];
-				Movie filme = new Movie(false, id, title, year, certificate, genre, rating, director);
-				id++;
-				filmes.add(filme);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return filmes;
-	}
-
-	public static void readBinary() {
-		File file = new File("../data/arquivo.bin");
-
-		try {
-			FileInputStream inputStream = new FileInputStream(file);
-			byte[] bytes = new byte[(int) file.length()]; // cria um array de bytes com o tamanho do arquivo
-			int bytesRead = inputStream.read(bytes); // lê o arquivo para o array de bytes
-
-			// Imprime o array de bytes em formato hexadecimal
-			for (int i = 0; i < bytesRead; i++) {
-				System.out.printf("%02X ", bytes[i]);
-			}
-
-			inputStream.close(); // fecha o arquivo
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 	}
 }
