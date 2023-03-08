@@ -293,7 +293,7 @@ public class CRUD {
 			file.seek(posicao);
 			int tamanho = file.readInt();
 			boolean lapide = file.readBoolean();
-			file.seek(posicao + 4);
+			file.seek(posicao + 5);
 			int registroId = file.readInt();
 			if (lapide == false && registroId == id) {
 				return posicao;
@@ -312,7 +312,7 @@ public class CRUD {
 			file.seek(posicao);
 			int tamanho = file.readInt();
 			boolean lapide = file.readBoolean();
-			file.seek(posicao + 4);
+			file.seek(posicao + 5);
 			file.readInt();
 			registroTitle = file.readUTF();
 			if (lapide == false && registroTitle.equals(title)) {
@@ -334,7 +334,12 @@ public class CRUD {
 				String[] atributos = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				// o regex acima divide a linha em campos, ignorando as vírgulas entre aspas
 				String title = atributos[0];
-				Date year = new Date();// por enquanto deixei assim(atributos[1])
+				int year = 0;
+				if (atributos[1].length() == 4){
+					year = Integer.parseInt(atributos[1]);
+				} else {
+					year = Integer.parseInt(atributos[1].substring(atributos[1].length() - 4));
+				}
 				String certificate = atributos[2];
 				String[] genre = atributos[3].replaceAll("^\"|\"$", "").split(",");
 				float rating = Float.parseFloat(atributos[4]);
