@@ -228,7 +228,7 @@ public class CRUD {
 				System.out.println("Digite o ano de lançamento do filme");
 				int date = sc.nextInt();
 
-				Date year = new Date();// por enquanto deixei assim(atributos[1])
+				//Date year = new Date();// por enquanto deixei assim(atributos[1])
 				/*
 				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
 				 * j_temp.certificate.length());
@@ -239,7 +239,7 @@ public class CRUD {
 				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
 				 * j_temp.certificate.length() + 4 + temp2); file.writeLong(year.getTime());
 				 */
-				j_temp.year = year;
+				j_temp.year = Movie.parseDate(date);
 				break;
 
 			case 0:
@@ -270,7 +270,7 @@ public class CRUD {
 			file.writeBoolean(true); // marca o movie como removido
 
 			j_temp.fromByteArray(ba);
-
+			
 			System.out.println("ITEM REMOVIDO!");
 		} else {
 			System.out.println("ERRO: ITEM NÃO ENCONTRADO");

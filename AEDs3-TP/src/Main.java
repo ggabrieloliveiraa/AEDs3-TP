@@ -84,6 +84,7 @@ public class Main {
 						System.out.println("Qual ID você deseja remover?");
 						id = scanner.nextInt();
 						m_temp = crud.remover(id);
+						break;
 					case 5:
 						crud.cargaInicial();
 						System.out.println("Carga inicial realizada!");

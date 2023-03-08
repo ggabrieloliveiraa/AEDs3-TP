@@ -64,7 +64,8 @@ public class Movie {
 		dos.writeUTF(title);
 		//dos.writeInt(director.length());
 		dos.writeUTF(director);
-		dos.writeUTF(certificate);
+		dos.writeBytes(String.format("%-5s", certificate)); // escreve a string com tamanho fixo de 5 caracteres
+		//dos.writeUTF(certificate);
 		dos.writeInt(genre.length);
 		String stringzona = "";
 		for (int i = 0; i < genre.length; i++) {
@@ -91,7 +92,10 @@ public class Movie {
 		title = dis.readUTF();
 		//int directorSiz = dis.readInt();
 		director = dis.readUTF();
-		certificate = dis.readUTF();
+		byte[] stringBytes = new byte[5];
+		dis.readFully(stringBytes);
+		certificate = new String(stringBytes);
+		//certificate = dis.readUTF();
 		int quantGen = dis.readInt();
 		String allGen = dis.readUTF();
 		genre = allGen.split(",");
