@@ -83,6 +83,7 @@ public class CRUD {
 			tamanho = file.readInt();
 			ba = new byte[tamanho];
 			file.seek(posicao + 4);
+			System.out.println("posicao = " + file.getFilePointer());
 			file.read(ba);
 			j_temp.fromByteArray(ba);
 			return j_temp;
@@ -326,7 +327,7 @@ public class CRUD {
 
 	public static List<Movie> readCsv(String filename) {
 		List<Movie> filmes = new ArrayList<>();
-		int id = 0;
+		int id = 10064;
 		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
 			String line;
@@ -346,7 +347,7 @@ public class CRUD {
 				float rating = Float.parseFloat(atributos[4]);
 				String director = atributos[5];
 				Movie filme = new Movie(false, id, title, year, certificate, genre, rating, director);
-				id++;
+				id--;
 				filmes.add(filme);
 			}
 		} catch (IOException e) {

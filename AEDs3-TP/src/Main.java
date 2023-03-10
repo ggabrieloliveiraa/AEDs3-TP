@@ -13,6 +13,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		interfac();
+		try {
+			OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 5033, 2);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void interfac() {
@@ -84,6 +89,7 @@ public class Main {
 						System.out.println("Qual ID você deseja remover?");
 						id = scanner.nextInt();
 						m_temp = crud.remover(id);
+						break;
 					case 5:
 						crud.cargaInicial();
 						System.out.println("Carga inicial realizada!");
