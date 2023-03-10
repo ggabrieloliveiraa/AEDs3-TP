@@ -280,6 +280,31 @@ public class CRUD {
 		return j_temp;
 	}
 
+	public void mostrarTudo (String filename, int pos) throws IOException {
+		RandomAccessFile arq = new RandomAccessFile("../data/" + filename, "rw");
+		Movie j_temp = new Movie();
+		arq.seek(pos);
+		int tamanho = 0;
+		int i = 0;
+		for (i = 0; arq.getFilePointer() < arq.length(); i++){
+			
+			tamanho = arq.readInt();
+			//System.out.println(tamanho);
+			byte ba[];
+			ba = new byte[tamanho];
+			arq.read(ba);
+
+			if (arq.getFilePointer() < arq.length()+1){
+				j_temp.fromByteArray(ba);
+				if (j_temp.id == 5032){
+					System.out.println(j_temp);
+				}
+			}
+			
+		}
+		System.out.println("lido " + i + " registros");
+	}
+
 	/*
 	 * int apontar - aponta pro inicio do registro
 	 * 

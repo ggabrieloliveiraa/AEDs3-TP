@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		interfac();
 		try {
-			OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 5033, 2);
+			OrdenacaoExterna.externalSort("../data/arquivo", 5033, 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -31,7 +31,8 @@ public class Main {
 				System.out.println("2 - Inserir");
 				System.out.println("3 - Atualizar");
 				System.out.println("4 - Excluir");
-				System.out.println("5 - Carga inicial");
+				System.out.println("5 - Mostrar tudo");
+				System.out.println("6 - Carga inicial");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -91,6 +92,9 @@ public class Main {
 						m_temp = crud.remover(id);
 						break;
 					case 5:
+						crud.mostrarTudo("arquivo.bin", 4);
+						break;
+					case 6:
 						crud.cargaInicial();
 						System.out.println("Carga inicial realizada!");
 						System.out.println("Maior ID = " + crud.getMaxId());
