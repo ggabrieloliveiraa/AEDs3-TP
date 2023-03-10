@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.*;
 
 public class OrdenacaoExterna {
+	
 	private static void quickSort(Movie[] vetor, int inicio, int fim) {
 		if (inicio < fim) {
 			int posicaoPivo = separar(vetor, inicio, fim);
@@ -61,6 +62,7 @@ public class OrdenacaoExterna {
 				}
 			}
 			quickSort(filmes, 0, filmes.length - 1); // ordena os blocos de tamanho m atributos em memoria principal
+			System.out.println("filme ultimo = " + filmes[filmes.length - 1]);
 			if (controle % n == 0) {
 				System.out.println("abc!");
 				distribuir(tamanhos, filmes, filename, n);
@@ -73,6 +75,11 @@ public class OrdenacaoExterna {
 			controle++;
 
 		}
+		System.out.println("--->");
+		//CRUD crud2 = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo2tmp.bin");
+		//System.out.println(crud2.buscar(1));
+		//crud2.mostrarTudoBin();
+		crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo2tmp.bin", 0);
 		intercalacaoBalanceada(arqs, m);
 		input.close();
 	}
@@ -84,9 +91,7 @@ public class OrdenacaoExterna {
 		int passadas = (int) (1 + Math.ceil((Math.log((maxId / (double) m))) / Math.log((double) n)));
 		// double fds = (1 + (Math.log((maxId / m)) / Math.log(n)));
 		// System.out.println(fds);
-
 		return passadas;
-
 	}
 
 	private static void intercalacaoBalanceada(String[] inputFiles, int m) throws IOException {
@@ -159,6 +164,7 @@ public class OrdenacaoExterna {
 					raf1.read(ba1);
 					j_temp[0].fromByteArray(ba1);
 					tamanhos[1] = raf2.readInt();
+					raf2.readInt();
 					System.out.println("t1 = " + tamanhos[1]);
 					ba2 = new byte[tamanhos[1]];
 					raf2.read(ba2);
@@ -284,10 +290,10 @@ public class OrdenacaoExterna {
 		byte ba[];
 		for (int i = 0; i < filmes.length; i++) {
 			if (filmes[i].id != -1) {
-				//System.out.println("id ordenado = " + filmes[i].id);
+				// System.out.println("id ordenado = " + filmes[i].id);
 				ba = new byte[tamanhos[i]];
 				ba = filmes[i].toByteArray();
-				output.writeInt(tamanhos[i]);
+				output.writeInt(ba.length);
 				output.write(ba);
 			}
 		}
