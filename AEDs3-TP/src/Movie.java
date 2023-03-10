@@ -63,11 +63,8 @@ public class Movie {
 		dos.writeInt(id);
 		// dos.writeInt(title.length());
 		dos.writeUTF(title);
-		//System.out.println(title);
 		dos.writeUTF(director);
 		dos.writeBytes(String.format("%-9s", certificate)); // escreve a string com tamanho fixo de 5 caracteres
-		//dos.writeUTF(certificate);
-		//System.out.println("id = " + id);
 		dos.writeInt(genre.length);
 		String stringzona = "";
 		for (int i = 0; i < genre.length; i++) {
@@ -76,7 +73,6 @@ public class Movie {
 		}
 		dos.writeUTF(stringzona);
 		stringzona = stringzona.substring(0, stringzona.length() - 1);
-		//System.out.println("tobytearray genres = " + stringzona);
 		dos.writeFloat(rating);
 		dos.writeLong(year.getTime());
 
@@ -87,34 +83,17 @@ public class Movie {
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(ba);
 		DataInputStream dis = new DataInputStream(bais);
-		// boolean fdc = dis.readBoolean();
-		// System.out.println(fdc);
 
 		lapide = dis.readBoolean();
 		id = dis.readInt();
-		//System.out.println("id = " + id);
-		//int titleSiz = dis.readInt();
 		title = dis.readUTF();
-		// System.out.println(" t = " + title);
-		// int directorSiz = dis.readInt();
 		director = dis.readUTF();
 		byte[] stringBytes = new byte[9];
 		dis.readFully(stringBytes);
 		certificate = new String(stringBytes);
-		// certificate = dis.readUTF();
 		int quantGen = dis.readInt();
 		String allGen = dis.readUTF();
-		// System.out.println("frombytearray genres = " + allGen);
 		genre = allGen.split(",");
-		// System.out.println("genre = " + genre[0]);
-		/*
-		 * for(int i = 0; i < quantGen; i++){
-		 * 
-		 * genre[i] = dis.readUTF();
-		 * genre[i].substring(1);
-		 * System.out.println(genre[i]);
-		 * }
-		 */
 		rating = dis.readFloat();
 		year = new Date(dis.readLong());
 
