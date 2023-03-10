@@ -59,6 +59,9 @@ public class OrdenacaoExterna {
 				ba = new byte[tamanhos[i]];
 				input.read(ba);
 				filmes[i].fromByteArray(ba);
+				if(i == m - 1) {
+					System.out.println("AIHFUIASDHFA = " + filmes[i].id);
+				}
 				}
 			}
 			quickSort(filmes, 0, filmes.length - 1); //ordena os blocos de tamanho m atributos em memoria principal

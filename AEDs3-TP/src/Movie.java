@@ -61,11 +61,11 @@ public class Movie {
 		dos.writeBoolean(lapide);
 		dos.writeInt(id);
 		dos.writeUTF(title);
-		System.out.println(title);
+		//System.out.println(title);
 		dos.writeUTF(director);
 		dos.writeBytes(String.format("%-9s", certificate)); // escreve a string com tamanho fixo de 5 caracteres
 		//dos.writeUTF(certificate);
-		System.out.println("id = " + id);
+		//System.out.println("id = " + id);
 		dos.writeInt(genre.length);
 		String stringzona = "";
 		for (int i = 0; i < genre.length; i++) {
@@ -73,8 +73,8 @@ public class Movie {
 			stringzona += ",";
 		}
 		dos.writeUTF(stringzona);
-		//stringzona = stringzona.substring(0, stringzona.length() - 1);
-		System.out.println("tobytearray genres = " + stringzona);
+		stringzona = stringzona.substring(0, stringzona.length() - 1);
+		//System.out.println("tobytearray genres = " + stringzona);
 		dos.writeFloat(rating);
 		dos.writeLong(year.getTime());
 
@@ -90,12 +90,13 @@ public class Movie {
 
 		lapide = dis.readBoolean();
 		id = dis.readInt();
+		//System.out.println("id = " + id);
 		//int titleSiz = dis.readInt();
 		title = dis.readUTF();
 		//System.out.println(" t = " + title);
 		//int directorSiz = dis.readInt();
 		director = dis.readUTF();
-		byte[] stringBytes = new byte[5];
+		byte[] stringBytes = new byte[9];
 		dis.readFully(stringBytes);
 		certificate = new String(stringBytes);
 		//certificate = dis.readUTF();
