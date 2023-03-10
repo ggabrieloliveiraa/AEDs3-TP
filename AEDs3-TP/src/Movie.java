@@ -74,7 +74,11 @@ public class Movie {
 		dos.writeUTF(stringzona);
 		stringzona = stringzona.substring(0, stringzona.length() - 1);
 		dos.writeFloat(rating);
+		if(id == 0) {
+			System.out.println(year);
+		}
 		dos.writeLong(year.getTime());
+		
 
 		return baos.toByteArray();
 	}
@@ -86,6 +90,7 @@ public class Movie {
 
 		lapide = dis.readBoolean();
 		id = dis.readInt();
+		System.out.println("id = " + id);
 		title = dis.readUTF();
 		director = dis.readUTF();
 		byte[] stringBytes = new byte[9];
@@ -95,7 +100,10 @@ public class Movie {
 		String allGen = dis.readUTF();
 		genre = allGen.split(",");
 		rating = dis.readFloat();
+		//System.out.println("r = " + rating);
 		year = new Date(dis.readLong());
+		//year = new Date();
+		//System.out.println(year);
 
 	}
 }
