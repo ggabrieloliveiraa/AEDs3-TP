@@ -10,9 +10,6 @@ public class CRUD {
 	public CRUD(String nomeArquivo) throws IOException {
 		String tmp = nomeArquivo;
 		this.file = new RandomAccessFile(tmp, "rw");
-		if (file.length() == 0) {
-			System.out.println("aaa");
-		}
 	}
 
 	public void fechar() throws IOException {
@@ -51,7 +48,7 @@ public class CRUD {
 				byte[] arr = j_temp.toByteArray();
 				file.write(arr);
 
-   			System.out.println("filme adicionado na posicao: " + j_temp.id);
+				System.out.println("filme adicionado na posicao: " + j_temp.id);
 				return;
 			}
 
@@ -86,6 +83,7 @@ public class CRUD {
 			tamanho = file.readInt();
 			ba = new byte[tamanho];
 			file.seek(posicao + 4);
+			System.out.println("posicao = " + file.getFilePointer());
 			file.read(ba);
 			j_temp.fromByteArray(ba);
 			return j_temp;
@@ -231,7 +229,7 @@ public class CRUD {
 				System.out.println("Digite o ano de lançamento do filme");
 				int date = sc.nextInt();
 
-				Date year = new Date();// por enquanto deixei assim(atributos[1])
+				//Date year = new Date();// por enquanto deixei assim(atributos[1])
 				/*
 				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
 				 * j_temp.certificate.length());
@@ -242,7 +240,7 @@ public class CRUD {
 				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
 				 * j_temp.certificate.length() + 4 + temp2); file.writeLong(year.getTime());
 				 */
-				j_temp.year = year;
+				j_temp.year = Movie.parseDate(date);
 				break;
 
 			case 0:
@@ -273,7 +271,7 @@ public class CRUD {
 			file.writeBoolean(true); // marca o movie como removido
 
 			j_temp.fromByteArray(ba);
-
+			
 			System.out.println("ITEM REMOVIDO!");
 		} else {
 			System.out.println("ERRO: ITEM NÃO ENCONTRADO");
@@ -296,7 +294,7 @@ public class CRUD {
 			file.seek(posicao);
 			int tamanho = file.readInt();
 			boolean lapide = file.readBoolean();
-			file.seek(posicao + 4);
+			file.seek(posicao + 5);
 			int registroId = file.readInt();
 			if (lapide == false && registroId == id) {
 				return posicao;
@@ -315,7 +313,7 @@ public class CRUD {
 			file.seek(posicao);
 			int tamanho = file.readInt();
 			boolean lapide = file.readBoolean();
-			file.seek(posicao + 4);
+			file.seek(posicao + 5);
 			file.readInt();
 			registroTitle = file.readUTF();
 			if (lapide == false && registroTitle.equals(title)) {
@@ -328,7 +326,7 @@ public class CRUD {
 
 	public static List<Movie> readCsv(String filename) {
 		List<Movie> filmes = new ArrayList<>();
-		int id = 0;
+		int id = 10064;
 		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
 			String line;
@@ -337,13 +335,18 @@ public class CRUD {
 				String[] atributos = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				// o regex acima divide a linha em campos, ignorando as vírgulas entre aspas
 				String title = atributos[0];
-				Date year = new Date();// por enquanto deixei assim(atributos[1])
+				int year = 0;
+				if (atributos[1].length() == 4){
+					year = Integer.parseInt(atributos[1]);
+				} else {
+					year = Integer.parseInt(atributos[1].substring(atributos[1].length() - 4));
+				}
 				String certificate = atributos[2];
 				String[] genre = atributos[3].replaceAll("^\"|\"$", "").split(",");
 				float rating = Float.parseFloat(atributos[4]);
 				String director = atributos[5];
 				Movie filme = new Movie(false, id, title, year, certificate, genre, rating, director);
-				id++;
+				id--;
 				filmes.add(filme);
 			}
 		} catch (IOException e) {
@@ -378,6 +381,7 @@ public class CRUD {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return;
 	}
 
 	/*

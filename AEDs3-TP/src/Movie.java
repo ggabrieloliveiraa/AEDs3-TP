@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.text.*;
 
 public class Movie {
 	protected boolean lapide;
@@ -15,7 +16,7 @@ public class Movie {
 	protected float rating;
 	protected java.util.Date year;
 
-	public Movie(boolean lapide, int id, String title, Date year, String certificate, String[] genre, float rating,
+	public Movie(boolean lapide, int id, String title, int year, String certificate, String[] genre, float rating,
 			String director) {
 		this.lapide = lapide;
 		this.id = id;
@@ -24,8 +25,16 @@ public class Movie {
 		this.certificate = certificate;
 		this.genre = genre;
 		this.rating = rating;
-		this.year = year;
+		this.year = parseDate(year);
 	}
+
+	public static Date parseDate(int date) {
+		try {
+			return new SimpleDateFormat("dd/MM/yyyy").parse("01/01/" + date); // só temos informação do ano, logo todas as datas serão 1 de janeiro
+		} catch (ParseException e) {
+			return null;
+		}
+	 }
 
 	public Movie() {
 		this.id = -1;
@@ -39,7 +48,7 @@ public class Movie {
 
 	@Override
 	public String toString() {
-		return "Movie [id=" + id + ", title=" + title + ", director=" + director
+		return "Movie [lapide=" + lapide + ", id=" + id + ", title=" + title + ", director=" + director
 				+ ", certificate=" + certificate + ", genre=" + Arrays.toString(genre) + ", rating=" + rating
 				+ ", year=" + year + "]";
 	}
@@ -49,10 +58,14 @@ public class Movie {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
 
+		dos.writeBoolean(lapide);
 		dos.writeInt(id);
 		dos.writeUTF(title);
+		System.out.println(title);
 		dos.writeUTF(director);
-		dos.writeUTF(certificate);
+		dos.writeBytes(String.format("%-9s", certificate)); // escreve a string com tamanho fixo de 5 caracteres
+		//dos.writeUTF(certificate);
+		System.out.println("id = " + id);
 		dos.writeInt(genre.length);
 		String stringzona = "";
 		for (int i = 0; i < genre.length; i++) {
@@ -60,6 +73,8 @@ public class Movie {
 			stringzona += ",";
 		}
 		dos.writeUTF(stringzona);
+		//stringzona = stringzona.substring(0, stringzona.length() - 1);
+		System.out.println("tobytearray genres = " + stringzona);
 		dos.writeFloat(rating);
 		dos.writeLong(year.getTime());
 
@@ -72,13 +87,23 @@ public class Movie {
 		DataInputStream dis = new DataInputStream(bais);
 		// boolean fdc = dis.readBoolean();
 		// System.out.println(fdc);
+
+		lapide = dis.readBoolean();
 		id = dis.readInt();
+		//int titleSiz = dis.readInt();
 		title = dis.readUTF();
+		//System.out.println(" t = " + title);
+		//int directorSiz = dis.readInt();
 		director = dis.readUTF();
-		certificate = dis.readUTF();
+		byte[] stringBytes = new byte[5];
+		dis.readFully(stringBytes);
+		certificate = new String(stringBytes);
+		//certificate = dis.readUTF();
 		int quantGen = dis.readInt();
 		String allGen = dis.readUTF();
+		//System.out.println("frombytearray genres = " + allGen);
 		genre = allGen.split(",");
+		//System.out.println("genre = " + genre[0]);
 		/*
 		 * for(int i = 0; i < quantGen; i++){
 		 * 

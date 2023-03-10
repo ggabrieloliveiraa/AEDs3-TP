@@ -13,14 +13,19 @@ public class Main {
 
 	public static void main(String[] args) {
 		interfac();
+		try {
+		OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 5033, 2);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void interfac() {
 		Scanner scanner = new Scanner(System.in);
 		try {
 			CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+
 			while (true) {
-				//System.out.println("Maior ID = " + crud.getMaxId());
 				System.out.println("Selecione uma operação:");
 				System.out.println("1 - Listar");
 				System.out.println("2 - Inserir");
@@ -84,6 +89,7 @@ public class Main {
 						System.out.println("Qual ID você deseja remover?");
 						id = scanner.nextInt();
 						m_temp = crud.remover(id);
+						break;
 					case 5:
 						crud.cargaInicial();
 						System.out.println("Carga inicial realizada!");
@@ -162,12 +168,12 @@ public class Main {
 		System.out.println("Digite a avaliação do filme, separado por vírgula");
 		rating = sc.nextFloat();
 
-		System.out.println("Digite o ano de lançamento do filme");
+		System.out.println("Digite o ano de lançamento do filme (YYYY)");
 		int date = sc.nextInt();
-		Date year = new Date();// por enquanto deixei assim(atributos[1])
+		//Date year = new Date();// por enquanto deixei assim(atributos[1])
 		//id = 10064;
 
-		Movie filme = new Movie(false, id, title, year, certificado, genre, rating, director);
+		Movie filme = new Movie(false, id, title, date, certificado, genre, rating, director);
 
 		return filme;
 
