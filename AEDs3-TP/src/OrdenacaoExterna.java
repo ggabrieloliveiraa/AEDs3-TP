@@ -123,6 +123,8 @@ public class OrdenacaoExterna {
 		int proxS = m;
 		int controle1 = 0;
 		int controle2 = 0;
+		int flag = 0;
+		int fds = 4;
 		System.out.println("passadas = " + passadas);
 		int a = (int) Math.ceil(((double) maxId + 1) / (double) n);
 		System.out.println("a = " + a);
@@ -135,12 +137,12 @@ public class OrdenacaoExterna {
 				controle1 = 2;
 				controle2 = 0;
 			}
-			System.out.println("ab = " + a / proxS);
-			System.out.println("a = " + a);
-			System.out.println("proxS = " + proxS);
-			double dentroInter = Math.ceil(((double)a / (double)proxS));
+			// System.out.println("ab = " + a / proxS);
+			// System.out.println("a = " + a);
+			// System.out.println("proxS = " + proxS);
+			double dentroInter = Math.ceil(((double) a / (double) proxS));
 			System.out.println("dentro = " + dentroInter);
-			for (int k = 0; k < dentroInter; k++) { //problema está nesse for
+			for (int k = 0; k < fds; k++) { // problema está nesse for
 				System.out.println("outra!!!!!!!!!!!!!");
 				for (int j = 0; j < tamS - 1; j++) {
 					if (controle2 > 3 && controle1 == 0) {
@@ -151,10 +153,10 @@ public class OrdenacaoExterna {
 						System.out.println("in2 = " + arqS[controle1 + 1]);
 						System.out.println("!!!! = " + arqS[controle2]);
 					}
-					//System.out.println("c2 antes = " + controle2);
+					// System.out.println("c2 antes = " + controle2);
 					// System.out.println("c2 depois = " + controle2);
 					// System.out.println("!!!! = " + arqS[controle2]);
-					//System.out.println("!!!! = " + arqS[controle2]);
+					// System.out.println("!!!! = " + arqS[controle2]);
 					RandomAccessFile raf1 = new RandomAccessFile(arqS[controle1], "r");
 					RandomAccessFile raf2 = new RandomAccessFile(arqS[controle1 + 1], "r");
 					RandomAccessFile rafOut = new RandomAccessFile(arqS[controle2], "rw");
@@ -167,13 +169,12 @@ public class OrdenacaoExterna {
 					// System.out.println("pos 2 = " + pos2);
 					raf1.seek(pos1);
 					raf2.seek(pos2);
-
 					tamanhos[0] = raf1.readInt();
 					// System.out.println("t0 = " + tamanhos[0]);
 					ba1 = new byte[tamanhos[0]];
 					raf1.read(ba1);
 					j_temp[0].fromByteArray(ba1);
-					if (raf2.getFilePointer() < raf2.length() - 1) {
+					if (pos2 >= raf2.length()) {
 						tamanhos[1] = raf2.readInt();
 						// System.out.println("t1 = " + tamanhos[1]);
 						ba2 = new byte[tamanhos[1]];
@@ -189,22 +190,24 @@ public class OrdenacaoExterna {
 							rafOut.write(ba2);
 							pos2 = pos2 + tamanhos[1] + 4;
 						}
-					}
-					if (k % 2 == 0) {
-						posOut1 = rafOut.getFilePointer();
-					} else {
-						posOut2 = rafOut.getFilePointer();
+						if (k % 2 == 0) {
+							posOut1 = rafOut.getFilePointer();
+						} else {
+							posOut2 = rafOut.getFilePointer();
+						}
 					}
 				}
 				controle2++;
-				//crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo3tmp.bin", 0);
+				// crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo3tmp.bin", 0);
 				System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!");
-				pos1 = pos2 = posOut1 = posOut2 = 0;
 			}
 			proxS = proxS * n;
 			tamS = tamS * n;
+			fds = fds / 2;
+			posOut1 = posOut2 = 0;
+			pos1 = pos2 = 0;
 		}
-		//crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo4tmp.bin", 0);
+		crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo1tmp.bin", 0);
 	}
 
 	public static void sort(String inputFiles1, String inputFiles2) throws IOException {
