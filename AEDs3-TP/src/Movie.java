@@ -99,8 +99,8 @@ public class Movie {
 		genre = allGen.split(",");
 		rating = dis.readFloat();
 		//System.out.println("r = " + rating);
-		//year = new Date(dis.readLong());
-		year = new Date();
+		year = new Date(dis.readLong());
+		//year = new Date();
 		//System.out.println(year);
 
 	}

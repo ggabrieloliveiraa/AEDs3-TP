@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		interfac();
 		try {
-			OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 5033, 2);
+			OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 2517, 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -31,8 +31,8 @@ public class Main {
 				System.out.println("2 - Inserir");
 				System.out.println("3 - Atualizar");
 				System.out.println("4 - Excluir");
-				System.out.println("5 - Carga inicial");
-				System.out.println("6 - Mostrar tudo");
+				System.out.println("5 - Mostrar tudo");
+				System.out.println("6 - Carga inicial");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -92,12 +92,12 @@ public class Main {
 					m_temp = crud.remover(id);
 					break;
 				case 5:
+					crud.mostrarTudo("arquivo.bin", 4);
+					break;
+				case 6:
 					crud.cargaInicial();
 					System.out.println("Carga inicial realizada!");
 					System.out.println("Maior ID = " + crud.getMaxId());
-					break;
-				case 6:
-					crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin", 4);
 					break;
 				case 0:
 					System.out.println("Saindo...");
@@ -110,7 +110,6 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		scanner.close();
 	}
 
 	// pegar cada atributo do filme por input do terminal
@@ -165,7 +164,6 @@ public class Main {
 
 		String[] genre = new String[k];
 		sc.nextLine();
-
 		for (int i = 0; i < k; i++) {
 			System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
 			genre[i] = sc.nextLine();
@@ -180,7 +178,6 @@ public class Main {
 		// id = 10064;
 
 		Movie filme = new Movie(false, id, title, date, certificado, genre, rating, director);
-		sc.close();
 
 		return filme;
 
