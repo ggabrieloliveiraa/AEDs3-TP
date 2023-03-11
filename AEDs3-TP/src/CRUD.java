@@ -296,9 +296,9 @@ public class CRUD {
 
 			if (arq.getFilePointer() < arq.length()+1){
 				j_temp.fromByteArray(ba);
-				if (j_temp.id == 5032){
+				//if (j_temp.id == 5032){
 					System.out.println(j_temp);
-				}
+				//}
 			}
 			
 		}

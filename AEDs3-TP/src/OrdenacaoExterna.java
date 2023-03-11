@@ -76,6 +76,8 @@ public class OrdenacaoExterna {
 		//System.out.println("AQUIIIIII");
 		//crud.mostrarTudo("arquivo1tmp.bin", 0);
 		intercalacaoBalanceada(arqs, m);
+		crud.mostrarTudo("arquivo3tmp.bin", 0);
+		//crud.mostrarTudo("arquivo4tmp.bin", 0);
 		input.close();
 	}
 
@@ -136,7 +138,7 @@ public class OrdenacaoExterna {
 			}
 			for (int k = 0; k < (a / proxS); k++) {
 				//System.out.println("!!!!!!!!!!!!!");
-				for (int j = 0; j < tamS; j++) {
+				for (int j = 0; j < tamS-1; j++) {
 					//System.out.println("c2 antes = " + controle2);
 					if (controle2 > 3) {
 						controle2 = 2;
@@ -146,7 +148,7 @@ public class OrdenacaoExterna {
 					RandomAccessFile raf1 = new RandomAccessFile(arqS[controle1], "r");
 					RandomAccessFile raf2 = new RandomAccessFile(arqS[controle1 + 1], "r");
 					RandomAccessFile rafOut = new RandomAccessFile(arqS[controle2], "rw");
-					if (j % 2 == 0) {
+					if (k % 2 == 0) {
 						rafOut.seek(posOut1);
 					} else {
 						rafOut.seek(posOut2);
@@ -162,29 +164,29 @@ public class OrdenacaoExterna {
 					raf1.read(ba1);
 					j_temp[0].fromByteArray(ba1);
 
-					if (raf2.getFilePointer() < raf2.length()){
-						tamanhos[1] = raf2.readInt();
-						System.out.println("t1 = " + tamanhos[1]);
-						ba2 = new byte[tamanhos[1]];
-						raf2.read(ba2);
-						j_temp[1].fromByteArray(ba2);
+					
+					tamanhos[1] = raf2.readInt();
+					System.out.println("t1 = " + tamanhos[1]);
+					ba2 = new byte[tamanhos[1]];
+					raf2.read(ba2);
+					j_temp[1].fromByteArray(ba2);
 
-						if (j_temp[0].id < j_temp[1].id) {
-							rafOut.writeInt(ba1.length);
-							rafOut.write(ba1);
-							pos1 = pos1 + tamanhos[0] + 4;
-						} else {
-							rafOut.writeInt(ba2.length);
-							rafOut.write(ba2);
-							pos2 = pos2 + tamanhos[1] + 4;
-						}
-						
-						if (j % 2 == 0) {
-							posOut1 = rafOut.getFilePointer();
-						} else {
-							posOut2 = rafOut.getFilePointer();
-						}
+					if (j_temp[0].id < j_temp[1].id) {
+						rafOut.writeInt(ba1.length);
+						rafOut.write(ba1);
+						pos1 = pos1 + tamanhos[0] + 4;
+					} else {
+						rafOut.writeInt(ba2.length);
+						rafOut.write(ba2);
+						pos2 = pos2 + tamanhos[1] + 4;
 					}
+					
+					if (k % 2 == 0) {
+						posOut1 = rafOut.getFilePointer();
+					} else {
+						posOut2 = rafOut.getFilePointer();
+					}
+					
 				
 				}
 				controle2++;
