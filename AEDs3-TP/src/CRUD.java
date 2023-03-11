@@ -398,26 +398,35 @@ public class CRUD {
 		}
 	}
 
-	public void mostrarTudo(String filename, int pos) throws IOException {
-		RandomAccessFile arq = new RandomAccessFile(filename, "rw");
-		Movie j_temp = new Movie();
-		arq.seek(pos);
-		int tamanho = 0;
-		int i = 0;
-		for (i = 0; arq.getFilePointer() < arq.length(); i++) {
+	public void mostrarTudo (String filename, int pos) throws IOException {
+        RandomAccessFile arq = new RandomAccessFile(filename, "rw");
+        Movie j_temp = new Movie();
+        arq.seek(pos);
+        int tamanho = 0;
+        int i = 0;
 
-			tamanho = arq.readInt();
-			// System.out.println(tamanho);
-			byte ba[];
-			ba = new byte[tamanho];
-			arq.read(ba);
-			if (arq.getFilePointer() < arq.length() + 1)
-			{
-			j_temp.fromByteArray(ba);
-			System.out.println(j_temp);
-			}
-		}
-		System.out.println("lido " + i + " registros");
-		return;
-	}
+        
+            for (i = 0; arq.getFilePointer() < arq.length() +1; i++){
+                if (arq.getFilePointer() < arq.length()){
+                    tamanho = arq.readInt();
+                    //System.out.println(tamanho);
+                    byte ba[];
+                    ba = new byte[tamanho];
+                    arq.read(ba);
+
+                    j_temp.fromByteArray(ba);    
+                    if(i == 1) {
+                    System.out.println(j_temp);
+                    }
+                                      
+                } else {
+                    System.out.println("lido " + i + " registros");
+                    return;
+                }
+            }
+        
+        System.out.println("lido " + i + " registros");
+        arq.close();
+    }
+	
 }
