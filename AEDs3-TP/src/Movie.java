@@ -74,9 +74,9 @@ public class Movie {
 		dos.writeUTF(stringzona);
 		stringzona = stringzona.substring(0, stringzona.length() - 1);
 		dos.writeFloat(rating);
-		if(id == 0) {
+		/*if(id == 0) {
 			System.out.println(year);
-		}
+		}*/
 		dos.writeLong(year.getTime());
 		
 
@@ -90,7 +90,7 @@ public class Movie {
 
 		lapide = dis.readBoolean();
 		id = dis.readInt();
-		System.out.println("id = " + id);
+		//System.out.println("id = " + id);
 		title = dis.readUTF();
 		director = dis.readUTF();
 		byte[] stringBytes = new byte[9];

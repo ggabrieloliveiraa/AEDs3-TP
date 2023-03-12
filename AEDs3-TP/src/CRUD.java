@@ -286,22 +286,35 @@ public class CRUD {
 		arq.seek(pos);
 		int tamanho = 0;
 		int i = 0;
-		for (i = 0; arq.getFilePointer() < arq.length(); i++){
-			
-			tamanho = arq.readInt();
-			//System.out.println(tamanho);
-			byte ba[];
-			ba = new byte[tamanho];
-			arq.read(ba);
 
-			if (arq.getFilePointer() < arq.length()+1){
-				j_temp.fromByteArray(ba);
-				//if (j_temp.id == 5032){
+		
+			for (i = 0; arq.getFilePointer() < arq.length() -1; i++){
+				if (arq.getFilePointer() < arq.length()-1){
+					tamanho = arq.readInt();
+					//System.out.println(tamanho);
+					byte ba[];
+					ba = new byte[tamanho];
+					arq.read(ba);
+
+				
+					j_temp.fromByteArray(ba);	
+
+					//if (i < 10) {
+						System.out.println(j_temp);
+						System.out.println("lido " + i + " registros");
+						System.out.println(arq.getFilePointer());
+						System.out.println(arq.length() - 1);
+					//}
+				} else {
 					System.out.println(j_temp);
-				//}
+					System.out.println("lido " + i + " registros");
+					System.out.println(arq.getFilePointer());
+					System.out.println(arq.length() - 1);
+
+					return;
+				}
 			}
-			
-		}
+		
 		System.out.println("lido " + i + " registros");
 	}
 
