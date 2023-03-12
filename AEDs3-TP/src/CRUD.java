@@ -288,7 +288,7 @@ public class CRUD {
 		int i = 0;
 
 		
-			for (i = 0; arq.getFilePointer() < arq.length() -1; i++){
+			for (i = 0; arq.getFilePointer() < arq.length() + 1; i++){
 				if (arq.getFilePointer() < arq.length()-1){
 					tamanho = arq.readInt();
 					//System.out.println(tamanho);
@@ -298,18 +298,18 @@ public class CRUD {
 
 				
 					j_temp.fromByteArray(ba);	
-
-					//if (i < 10) {
+				
+					if (i < 500) {
 						System.out.println(j_temp);
-						System.out.println("lido " + i + " registros");
-						System.out.println(arq.getFilePointer());
-						System.out.println(arq.length() - 1);
-					//}
+						//System.out.println("lido " + i + " registros");
+						//System.out.println(arq.getFilePointer());
+						//System.out.println(arq.length() - 1);
+					}
 				} else {
 					System.out.println(j_temp);
 					System.out.println("lido " + i + " registros");
-					System.out.println(arq.getFilePointer());
-					System.out.println(arq.length() - 1);
+					//System.out.println(arq.getFilePointer());
+					//System.out.println(arq.length() - 1);
 
 					return;
 				}

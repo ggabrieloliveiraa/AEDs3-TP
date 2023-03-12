@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		interfac();
 		try {
-			OrdenacaoExterna.sortInit("../data/arquivo", 1256, 2);
+			OrdenacaoExterna.sortInit("../data/arquivo", 1257, 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

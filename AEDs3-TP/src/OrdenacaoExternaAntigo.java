@@ -134,7 +134,7 @@ public class OrdenacaoExterna {
 		byte ba2[];
 		int controle1, controle2 = 0, controle3 = 0;//usadas para saber qual arquivo abrir
 		int pos1  = 4, pos2 = 4;//usadas para saber se mudou o registro que vai comparar
-		int posOut1  = 4, posOut2 = 4;
+		int posOut1  = 0, posOut2 = 0;
 		int tamanho = 0;
 		int count1 = 0, count2 = 0;
 
@@ -163,14 +163,21 @@ public class OrdenacaoExterna {
 					controle3 = 0;
 				}
 
-				
+				if (k == 0){
 					System.out.println("raf1 = " + inputFiles[controle1    ]);
 					System.out.println("raf2 = " + inputFiles[controle1  +1  ]);
 					System.out.println("rafOut = " + inputFiles[controle2    ]);
+				}
 				
+				//System.out.println("controle3 = " + controle3);
 				
+					
 				//for do interior de cada bloco	
 				for (int j = 0; j < interiorBloco ; j++) {			
+					
+					
+					//System.out.println("controle2 = " + controle2);
+					
 
 					//arquivo de saída e entrada
 					RandomAccessFile raf1   = new RandomAccessFile(inputFiles[controle1    ], "r" );
@@ -185,17 +192,14 @@ public class OrdenacaoExterna {
 					raf2.seek(0);
 					int size2 = raf2.readInt();
 
-					if ((k == quantBloco-1) && ((size1 + diferenca == regPorArq) || (size1 - diferenca == regPorArq))){
-						//System.out.println("acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + size1);
-						//System.out.println("interiorBloco = " + regPorArq);
-						System.out.println("diferenca = " + diferenca);
-
-						//System.out.println("interiorBloco = " + (Math.ceil((double)size1/(double)quantBloco)));
-						condicao1 = (count1 < ((interiorBloco - 1) - (diferenca)) );
+					if ((k == quantBloco-1) && (size1 != regPorArq)){
+						System.out.println("acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + size1);
+						System.out.println("interiorBloco = " + interiorBloco);
+						condicao1 = (count1 < (interiorBloco - (diferenca)) );
 						//condicao2 = (count2 < interiorBloco-1);
-					} else if ((k == quantBloco-1) && ((size2 + diferenca == regPorArq) || (size2 - diferenca == regPorArq))){
+					} else if ((k == quantBloco-1) && (size2 != regPorArq)){
 						//condicao1 = (count1 < interiorBloco-1);
-						condicao2 = (count2 < ((interiorBloco - 1) - (diferenca)) );
+						condicao2 = (count2 < (interiorBloco - (diferenca)) );
 					}
 
 					raf1.seek(pos1);
@@ -208,74 +212,152 @@ public class OrdenacaoExterna {
 						rafOut.seek(posOut2);//se for impar continua de onde parou anteriormente
 					}
 
-					if (condicao1){//se o primeiro existir
-						//lendo o registro do primeiro arquivo
+					try{
+					//abre e salva o registro do arquivo de entrada
+					
+  					if (condicao1){
+					//lendo o registro do primeiro arquivo
+					tamanho = raf1.readInt();
+					if (tamanho < 500 && tamanho > 0){
+					System.out.println("tamanho = " + tamanho);
+					ba1 = new byte[tamanho];					
+					
+					raf1.read(ba1);
+					j_temp1.fromByteArray(ba1);//transformando em objeto
+					//System.out.println("id = " + j_temp1.id);
+					}
 
-						tamanho = raf1.readInt();
-						ba1 = new byte[tamanho];					
-						raf1.read(ba1);
-						if (tamanho < 500){
-						j_temp1.fromByteArray(ba1);//transformando em objeto
-						}
-						
+					raf1.close();
+					
+						//confere se ainda existe alguma coisa no arquivo 2
+						if (condicao2) {
 
-						if (condicao2){//se o primeiro e segundo existirem
+							//abre e salva o registro do arquivo de entrada
+							
+
+							//System.out.println("regporarq = " + regPorArq);
+							//System.out.println("maxId = " + maxId);
+							//System.out.println("diferenca = " + diferenca);
+							//lendo o registro do segundo arquivo				
 							tamanho = raf2.readInt();
-							ba2 = new byte[tamanho];					
+							ba2 = new byte[tamanho];
+							raf2.read(ba2);
+							j_temp2.fromByteArray(ba2);//transformando em objeto
+							//System.out.println("tamanho = " + tamanho);
+							//System.out.println("id = " + j_temp2.id);
+							raf2.close();						
+							
+							//escrever no arquivo o registro menor
+							if (j_temp1.id <= j_temp2.id) {
+								//System.out.println("j_temp1 < j_temp2");
+								
+								int[] tmp = writeOutput(pos1, j_temp1, count1, controle3, rafOut);
+								pos1 = tmp[0];
+								controle3 = tmp[1];
+								count1 = tmp[2];
+							} else {
+								//System.out.println("j_temp1 > j_temp2");
+								
+								int[] tmp = writeOutput(pos2, j_temp2, count2, controle3, rafOut);
+								pos2 = tmp[0];
+								controle3 = tmp[1];
+								count2 = tmp[2];
+							}
+
+							if (k % 2 == 0) {
+								posOut1 = (int)(rafOut.getFilePointer());//salvar na variavel 1 se for par
+							} else {
+								posOut2 = (int)(rafOut.getFilePointer());//salvar na variavel 2 se for impar
+							}
+
+						} else{
+								int[] tmp = writeOutput(pos1, j_temp1, count1, controle3, rafOut);
+								pos1 = tmp[0];
+								controle3 = tmp[1];
+								count1 = tmp[2];
+						}
+					}}catch (IOException e) {
+						if (condicao2){
+							//abre e salva o registro do arquivo de entrada
+							
+
+							//lendo o registro do segundo arquivo
+							tamanho = raf2.readInt();
+							ba2 = new byte[tamanho];
 							raf2.read(ba2);
 							j_temp2.fromByteArray(ba2);//transformando em objeto
 							
+							raf2.close();
 
-							//comparar qual e' menor
-							if (j_temp1.id < j_temp2.id){				 
-								pos1 = writeOutput(pos1, j_temp1, rafOut);//escrever no arquivo de output
-								controle3++;
-								count1++;
-							} else {
-								pos2 = writeOutput(pos2, j_temp2, rafOut);//escrever no arquivo de output
-								controle3++;
-								count2++;
-							}
-						} else {//se o primeiro existir mas o segundo nao
-							pos1 = writeOutput(pos1, j_temp1, rafOut);//escrever no arquivo de output 
-							controle3++;
-							count1++;
-						}
-						
-					} else if (condicao2){//se o primeiro não existir mas o segundo existir
-						tamanho = raf2.readInt();
-						ba2 = new byte[tamanho];					
-						raf2.read(ba2);
-						j_temp2.fromByteArray(ba2);//transformando em objeto
-						
+							int[] tmp = writeOutput(pos2, j_temp2, count2, controle3, rafOut);
+							pos2 = tmp[0];
+							controle3 = tmp[1];
+							count2 = tmp[2];
+						}/* else {
+							//abre e salva o registro do arquivo de entrada
+							
 
-						pos2 = writeOutput(pos2, j_temp2, rafOut);//escrever no arquivo de output
-						controle3 ++;
-						count2++;
+							//lendo o registro do primeiro arquivo
+							tamanho = raf1.readInt();
+							ba1 = new byte[tamanho];
+							System.out.println("tamanho = " + tamanho);
+							raf1.read(ba1);
+							j_temp1.fromByteArray(ba1);//transformando em objeto
+							System.out.println("id = " + j_temp1.id);
+							raf1.close();
+
+							int[] tmp = writeOutput(pos1, j_temp1, count1, controle3, rafOut);
+							pos1 = tmp[0];
+							controle3 = tmp[1];
+							count1 = tmp[2];
+						}*/
+					}
+					if (k % 2 == 0) {
+						posOut1 = (int)(rafOut.getFilePointer());//salvar na variavel 1 se for par
+					} else {
+						posOut2 = (int)(rafOut.getFilePointer());//salvar na variavel 2 se for impar
 					}
 
-				if (k % 2 == 0) {
-					posOut1 = (int)(rafOut.getFilePointer());//salvar na variavel 1 se for par
-				} else {
-					posOut2 = (int)(rafOut.getFilePointer());//salvar na variavel 2 se for impar
-				}
+					//System.out.println("id1 = "+j_temp1.id);
+					//System.out.println("id2 = "+j_temp2.id);
 
-				raf1.close();
-				raf2.close();
-				rafOut.close();
-				
+					//crud.mostrarTudo(inputFiles[controle2], 0);
+					//System.out.println("posicaodoponteiro = " + rafOut.getFilePointer());
+					rafOut.close();
+					
+					
+					//System.out.println("count1 = " + count1);
+					//System.out.println("count2 = " + count2);
+					//System.out.println("interioBloco = " + interiorBloco);
+					
+	//					System.out.println("raf1 = " + inputFiles[controle1    ]);
+	//					System.out.println("raf2 = " + inputFiles[controle1  +1  ]);
+	//					System.out.println("rafOut = " + inputFiles[controle2    ]);
+					
+					//System.out.println("arquivo escrito por ultimo = " + inputFiles[controle2]);
+					
+
+				}//fim for do interior de cada bloco	
+
+				//crud.mostrarTudo(inputFiles[controle2], 0);
+				if (k != 0){
+					System.out.println("raf1 = " + inputFiles[controle1    ]);
+					System.out.println("raf2 = " + inputFiles[controle1  +1  ]);
+					System.out.println("rafOut = " + inputFiles[controle2    ]);
 				}
+				//System.out.println("count1 = " + count1);
+				//System.out.println("count2 = " + count2);
+				System.out.println("countTotal = " + (count1 + count2));
 
 				count1 = 0;
 				count2 = 0;
-				
 			}//fim for de cada bloco
 
 			
 			interiorBloco = interiorBloco*n;//mudar o tamanho de cada bloco de acordo com a fase
 			//System.out.println("interiorBloco = " + interiorBloco + "/// n = " + n);
 			System.out.println("regporarq = " + regPorArq);
-			quantBloco = (int)Math.ceil((double)regPorArq/(double)interiorBloco);//mudar a quantidade de blocos por arquivo de acordo com a fase
+			quantBloco = (int)Math.floor((double)regPorArq/(double)interiorBloco);//mudar a quantidade de blocos por arquivo de acordo com a fase
 			System.out.println("quantBloco = " + quantBloco);
 
 			System.out.println("arquivo escrito por ultimo = " + inputFiles[controle2]);
@@ -285,13 +367,19 @@ public class OrdenacaoExterna {
 
 	}
 
-	public static int writeOutput(int pos, Movie j_temp, RandomAccessFile rafOut) throws IOException{
+	public static int[] writeOutput(int pos, Movie j_temp, int count, int controle, RandomAccessFile rafOut) throws IOException{
+		//answer[0] = pos;
+		//answer[1] = controle;
+		//answer[2] = count;
+		int[] answer = new int[3];
 		int posUltimo = (int)rafOut.getFilePointer();
 		rafOut.seek(0);
 		int size = rafOut.readInt();
 		rafOut.seek(0);
 		rafOut.writeInt(size + 1);
 		rafOut.seek(posUltimo);
+
+		//System.out.println(rafOut.getFilePointer());
 
 		byte[] ba = new byte[j_temp.toByteArray().length];
 		ba = j_temp.toByteArray();
@@ -300,13 +388,18 @@ public class OrdenacaoExterna {
 		rafOut.write(ba);
 		pos = pos + ba.length + 4;//atualizar pos pra nova posicao
 
-		
+		controle++;//para mudar os blocos
+		count++;
 
 		//System.out.println(j_temp);
 
+		answer[0] = pos;
+		answer[1] = controle;
+		answer[2] = count;
+
 		//crud.mostrarTudo(filename, 0);
 
-		return (pos);
+		return (answer);
 	}
 
 	private static int calcularPassadas(int m, int n) throws IOException {
