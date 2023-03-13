@@ -1,23 +1,11 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.*;
 import java.util.Scanner;
 
 public class Main {
 
 	public static void main(String[] args) {
 		interfac();
-		try {
-			OrdenacaoExterna.sortInit("../data/arquivo", 1257, 2);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public static void interfac() {
@@ -33,6 +21,9 @@ public class Main {
 				System.out.println("4 - Excluir");
 				System.out.println("5 - Mostrar tudo");
 				System.out.println("6 - Carga inicial");
+				System.out.println("7 - Carga inicial com IDs aleatorios");
+				System.out.println("");
+				System.out.println("8 - Ordenacao externa");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -92,12 +83,24 @@ public class Main {
 						m_temp = crud.remover(id);
 						break;
 					case 5:
-						crud.mostrarTudo("arquivo.bin", 4);
+						crud.mostrarTudo("../data/arquivo.bin", 4);
 						break;
 					case 6:
 						crud.cargaInicial();
 						System.out.println("Carga inicial realizada!");
 						System.out.println("Maior ID = " + crud.getMaxId());
+						break;
+					case 7:
+						crud.cargaInicialRandom();
+						System.out.println("Carga inicial realizada!");
+						System.out.println("Maior ID = " + crud.getMaxId());
+						break;
+					case 8:
+						try {
+							OrdenacaoExterna.externalSort("../data/arquivo", 2517, 2);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 						break;
 					case 0:
 						System.out.println("Saindo...");
@@ -110,6 +113,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		scanner.close();
 	}
 
 	// pegar cada atributo do filme por input do terminal
@@ -178,7 +182,7 @@ public class Main {
 		// id = 10064;
 
 		Movie filme = new Movie(false, id, title, date, certificado, genre, rating, director);
-
+		// sc.close();
 		return filme;
 
 	}
