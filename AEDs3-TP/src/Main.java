@@ -1,12 +1,5 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
 import java.util.Scanner;
 
 public class Main {
@@ -18,6 +11,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		interfac();
 	}
 
 	public static void interfac() {
@@ -33,6 +27,7 @@ public class Main {
 				System.out.println("4 - Excluir");
 				System.out.println("5 - Mostrar tudo");
 				System.out.println("6 - Carga inicial");
+				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -99,6 +94,11 @@ public class Main {
 					System.out.println("Carga inicial realizada!");
 					System.out.println("Maior ID = " + crud.getMaxId());
 					break;
+				case 7:
+					crud.cargaInicialRandom();
+					System.out.println("Carga inicial realizada!");
+					System.out.println("Maior ID = " + crud.getMaxId());
+					break;
 				case 0:
 					System.out.println("Saindo...");
 					crud.fechar();
@@ -110,6 +110,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		scanner.close();
 	}
 
 	// pegar cada atributo do filme por input do terminal
@@ -178,7 +179,7 @@ public class Main {
 		// id = 10064;
 
 		Movie filme = new Movie(false, id, title, date, certificado, genre, rating, director);
-
+		sc.close();
 		return filme;
 
 	}

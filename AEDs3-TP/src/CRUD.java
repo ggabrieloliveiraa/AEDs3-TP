@@ -112,8 +112,6 @@ public class CRUD {
 	public void atualizar(int id) throws IOException {
 		Scanner sc = new Scanner(System.in);
 		int posicao = apontar(id);
-		int temp = 0;
-		int temp2 = 0;
 		String tmp = "";
 
 		// Percorre o arquivo em busca do movie com o ID especificado
@@ -190,14 +188,12 @@ public class CRUD {
 				// ler os generos
 				System.out.println("Digite quantos gêneros o filmes vai ter");
 				int k = sc.nextInt();
-				int size = 0;
 
 				String[] genre = new String[k];
 				sc.nextLine();
 				for (int i = 0; i < k; i++) {
 					System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
 					genre[i] = sc.nextLine();
-					size += genre[i].length();
 				}
 
 				// verificar se cabe
@@ -211,35 +207,12 @@ public class CRUD {
 				float rating;
 				System.out.println("Digite a avaliação do filme, separado por vírgula");
 				rating = sc.nextFloat();
-				/*
-				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
-				 * j_temp.certificate.length()); temp = file.readInt();// pegar o tamanho do
-				 * array de generos temp2 = 0; for (int i = 0; 0 < temp; i++) { temp2 +=
-				 * file.readUTF().length(); }
-				 * 
-				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
-				 * j_temp.certificate.length() + 4 + temp2);
-				 * 
-				 * j_temp.rating = rating; file.writeFloat(rating);
-				 */
 				j_temp.rating = rating;
 				break;
 
 			case 6:
 				System.out.println("Digite o ano de lançamento do filme");
 				int date = sc.nextInt();
-
-				// Date year = new Date();// por enquanto deixei assim(atributos[1])
-				/*
-				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
-				 * j_temp.certificate.length());
-				 * 
-				 * temp = file.readInt();// pegar o tamanho do array de generos temp2 = 0; for
-				 * (int i = 0; 0 < temp; i++) { temp2 += file.readUTF().length(); }
-				 * 
-				 * file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() +
-				 * j_temp.certificate.length() + 4 + temp2); file.writeLong(year.getTime());
-				 */
 				j_temp.year = Movie.parseDate(date);
 				break;
 
@@ -251,6 +224,7 @@ public class CRUD {
 			default:
 				System.out.println("Opção inválida!");
 			}
+			sc.close();
 		}
 
 	}
@@ -289,7 +263,6 @@ public class CRUD {
 	public int apontar(int id) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 4;
-		int len;
 		while (posicao < file.length()) {
 			file.seek(posicao);
 			int tamanho = file.readInt();
@@ -307,7 +280,6 @@ public class CRUD {
 	public int apontar(String title) throws IOException {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 4;
-		int len;
 		String registroTitle = "";
 		while (posicao < file.length()) {
 			file.seek(posicao);
@@ -356,9 +328,74 @@ public class CRUD {
 	}
 
 	public void cargaInicial() {
+		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
+		byte ba[];
+		try {
+			if (file.length() == 0) {
+				file.seek(0);
+				file.writeInt(filmes.size() - 1); // cabaço
+			} else {
+				file.seek(4);
+			}
+			for (int i = 0; i < filmes.size(); i++) {
+				// System.out.println("Posicao do registro: " + fos.getFilePointer());
+				ba = filmes.get(i).toByteArray();
+				file.writeInt(ba.length); // escreve tamanho da entidade
+				file.write(ba); // escreve o byte de arrays da entidade
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return;
+	}
+
+	public void mostrarTudoBin() throws IOException {
+		int pos = 0;
+		byte ba[];
+		Movie j_temp = new Movie();
+		while (pos < file.length()) {
+			int tamanho = file.readInt();
+			System.out.println("t = " + tamanho);
+			ba = new byte[tamanho];
+			file.read(ba);
+			j_temp.fromByteArray(ba);
+			System.out.println(j_temp);
+			pos += tamanho;
+		}
+	}
+
+	public void mostrarTudo(String filename, int pos) throws IOException {
+		RandomAccessFile arq = new RandomAccessFile(filename, "rw");
+		Movie j_temp = new Movie();
+		arq.seek(pos);
+		int tamanho = 0;
+		int i = 0;
+
+		for (i = 0; arq.getFilePointer() < arq.length(); i++) {
+			if (arq.getFilePointer() < arq.length()) {
+				tamanho = arq.readInt();
+				byte ba[];
+				ba = new byte[tamanho];
+				arq.read(ba);
+
+				j_temp.fromByteArray(ba);
+				System.out.println(j_temp);
+			} else {
+				System.out.println("segundo registro = " + j_temp);
+				System.out.println("lido " + i + " registros");
+				return;
+			}
+		}
+
+		System.out.println("lido " + i + " registros");
+		arq.close();
+	}
+
+	public void cargaInicialRandom() {
 		// RandomAccessFile fos = new
 		// RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", rw");
-		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
+		int[] id = aleatorizar(10064);
+		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {
@@ -383,50 +420,51 @@ public class CRUD {
 		return;
 	}
 
-	public void mostrarTudoBin() throws IOException {
-		int pos = 0;
-		byte ba[];
-		Movie j_temp = new Movie();
-		while (pos < file.length()) {
-			int tamanho = file.readInt();
-			System.out.println("t = " + tamanho);
-			ba = new byte[tamanho];
-			file.read(ba);
-			j_temp.fromByteArray(ba);
-			System.out.println(j_temp);
-			pos += tamanho;
+	public static List<Movie> readCsv(String filename, int[] id) {
+		List<Movie> filmes = new ArrayList<>();
+		int controle = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
+			String line;
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+				String[] atributos = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+				// o regex acima divide a linha em campos, ignorando as vírgulas entre aspas
+				String title = atributos[0];
+				int year = 0;
+				if (atributos[1].length() == 4) {
+					year = Integer.parseInt(atributos[1]);
+				} else {
+					year = Integer.parseInt(atributos[1].substring(atributos[1].length() - 4));
+				}
+				String certificate = atributos[2];
+				String[] genre = atributos[3].replaceAll("^\"|\"$", "").split(",");
+				float rating = Float.parseFloat(atributos[4]);
+				String director = atributos[5];
+				Movie filme = new Movie(false, id[controle], title, year, certificate, genre, rating, director);
+				controle++;
+				filmes.add(filme);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return filmes;
 	}
 
-	public void mostrarTudo (String filename, int pos) throws IOException {
-        RandomAccessFile arq = new RandomAccessFile(filename, "rw");
-        Movie j_temp = new Movie();
-        arq.seek(pos);
-        int tamanho = 0;
-        int i = 0;
+	public int[] aleatorizar(int max) {
+		int[] numbers = new int[10065];
+		for (int i = 0; i < numbers.length; i++) {
+			numbers[i] = i;
+		}
+		Random rand = new Random();
+		for (int i = numbers.length - 1; i > 0; i--) {
+			int j = rand.nextInt(i + 1);
+			int temp = numbers[i];
+			numbers[i] = numbers[j];
+			numbers[j] = temp;
+		}
 
-        
-            for (i = 0; arq.getFilePointer() < arq.length() +1; i++){
-                if (arq.getFilePointer() < arq.length()){
-                    tamanho = arq.readInt();
-                    //System.out.println(tamanho);
-                    byte ba[];
-                    ba = new byte[tamanho];
-                    arq.read(ba);
+		return numbers;
+	}
 
-                    j_temp.fromByteArray(ba);    
-                    if(i == 1) {
-                    System.out.println(j_temp);
-                    }
-                                      
-                } else {
-                    System.out.println("lido " + i + " registros");
-                    return;
-                }
-            }
-        
-        System.out.println("lido " + i + " registros");
-        arq.close();
-    }
-	
 }
