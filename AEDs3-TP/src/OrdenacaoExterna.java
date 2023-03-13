@@ -23,6 +23,7 @@ public class OrdenacaoExterna {
 		for (int i = 0; i < n; i++) { // cria os n arquivos
 			RandomAccessFile output = new RandomAccessFile(filename + (i + 1) + "tmp.bin", "rw");
 			arqs[i] = filename + (i + 1) + "tmp.bin";
+			output.seek(0);
 			output.writeInt(0); // cabaço
 			output.close();
 		}
@@ -122,7 +123,7 @@ public class OrdenacaoExterna {
 		//variaveis usadas para controlar o for
 		int passadas = calcularPassadas(m, n);
 		int regPorArq = (int) (Math.ceil((float) maxId / (float) m)/2)*m;//quantidade de registros em cada arquivo
-		int diferenca = (int)(regPorArq*n - maxId);//diferenca que pode ter em arquivo
+		int diferenca = (regPorArq * (n + 2)) - maxId;//diferenca que pode ter em arquivo
 		int quantBloco = (int)Math.ceil((double)(regPorArq)/(double)m);//quantidade de blocos em cada arquivo
 		//System.out.println("quant bloco antes = " + quantBloco);
 		int interiorBloco = m;
@@ -170,34 +171,43 @@ public class OrdenacaoExterna {
 				
 				
 				//for do interior de cada bloco	
-				for (int j = 0; j < interiorBloco ; j++) {			
+				for (int j = 0; j < interiorBloco; j++) {			
 
 					//arquivo de saída e entrada
 					RandomAccessFile raf1   = new RandomAccessFile(inputFiles[controle1    ], "r" );
 					RandomAccessFile raf2   = new RandomAccessFile(inputFiles[controle1 + 1], "r" );
 					RandomAccessFile rafOut = new RandomAccessFile(inputFiles[controle2    ], "rw");
 
-					boolean condicao1 = (count1 < interiorBloco-1);
-					boolean condicao2 = (count2 < interiorBloco-1);
+					boolean condicao1 = ((count1 < interiorBloco) && raf1.getFilePointer() < raf1.length() - 4);
+					boolean condicao2 = ((count2 < interiorBloco) && raf2.getFilePointer() < raf2.length() - 4);
 
 					raf1.seek(0);
 					int size1 = raf1.readInt();
 					raf2.seek(0);
 					int size2 = raf2.readInt();
 
-					if ((k == quantBloco-1) && ((size1 + diferenca == regPorArq) || (size1 - diferenca == regPorArq))){
+					if ((k == quantBloco-1) && ((size1 + (diferenca+1) == regPorArq) || (size1 - (diferenca +1)== regPorArq))){
 						//System.out.println("acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + size1);
 						//System.out.println("interiorBloco = " + regPorArq);
-						System.out.println("diferenca = " + diferenca);
+						//System.out.println("diferenca = " + diferenca);
 
 						//System.out.println("interiorBloco = " + (Math.ceil((double)size1/(double)quantBloco)));
-						condicao1 = (count1 < ((interiorBloco - 1) - (diferenca)) );
+						if ((size1 + (diferenca+1) == regPorArq)){
+							condicao1 = ((count1 < ((interiorBloco) - (diferenca)) ) && raf1.getFilePointer() < raf1.length() - 4);
+						}else {
+							condicao1 = ((count1 < ((interiorBloco) + (diferenca)) ) && raf1.getFilePointer() < raf1.length() - 4);
+						}
 						//condicao2 = (count2 < interiorBloco-1);
-					} else if ((k == quantBloco-1) && ((size2 + diferenca == regPorArq) || (size2 - diferenca == regPorArq))){
+					} else if ((k == quantBloco-1) && ((size2 + (diferenca +1) == regPorArq) || (size2 - (diferenca +1) == regPorArq))){
 						//condicao1 = (count1 < interiorBloco-1);
-						condicao2 = (count2 < ((interiorBloco - 1) - (diferenca)) );
+						if (size2 + (diferenca +1) == regPorArq){
+							condicao2 = ((count2 < ((interiorBloco) - (diferenca)) ) && raf2.getFilePointer() < raf2.length() - 4);
+						} else {
+							condicao2 = ((count2 < ((interiorBloco) + (diferenca)) ) && raf2.getFilePointer() < raf2.length() - 4);
+						}
 					}
 
+					
 					raf1.seek(pos1);
 					raf2.seek(pos2);
 
@@ -208,22 +218,46 @@ public class OrdenacaoExterna {
 						rafOut.seek(posOut2);//se for impar continua de onde parou anteriormente
 					}
 
-					if (condicao1){//se o primeiro existir
+					System.out.println("interiooooooooooooooooooooooooooorrrrrr" + interiorBloco);
+					System.out.println("regiostrooooooooossss" + regPorArq);
+					if (condicao1 && condicao2){//se o primeiro existir
 						//lendo o registro do primeiro arquivo
+						System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa count 1 = " + count1);
+						System.out.println("ponteiro 1 " + raf1.getFilePointer() + " -------------------------");
 
 						tamanho = raf1.readInt();
+						System.out.println("taaaaaaaaaamanho 1 " + tamanho);
+
 						ba1 = new byte[tamanho];					
 						raf1.read(ba1);
-						if (tamanho < 500){
+
 						j_temp1.fromByteArray(ba1);//transformando em objeto
-						}
+						
+						System.out.println("tamanho 1 " + raf1.length());
+						System.out.println("count 1 = " + count1);
+						System.out.println("id 1 =  " + j_temp1.id + " -------------------------");
+
+					
+
+
 						
 
-						if (condicao2){//se o primeiro e segundo existirem
+						//if (condicao2 && pos2 != raf2.length()){//se o primeiro e segundo existirem
+							
+							System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb count 2 = " + count2);
+							System.out.println("ponteiro 2 " + raf2.getFilePointer() + " -------------------------");
 							tamanho = raf2.readInt();
+							System.out.println("taaaaaaaaaamanho 2 " + tamanho);
+
 							ba2 = new byte[tamanho];					
 							raf2.read(ba2);
 							j_temp2.fromByteArray(ba2);//transformando em objeto
+							//System.out.println("ponteiro 2 " + raf2.getFilePointer() + " -------------------------");
+							System.out.println("tamanho 2 " + raf2.length());
+							System.out.println("count 2 = " + count2);
+							System.out.println("id 2 =  " + j_temp2.id + " -------------------------");
+							//System.out.println(j_temp2);
+
 							
 
 							//comparar qual e' menor
@@ -236,13 +270,37 @@ public class OrdenacaoExterna {
 								controle3++;
 								count2++;
 							}
-						} else {//se o primeiro existir mas o segundo nao
+						/*} else {//se o primeiro existir mas o segundo nao
 							pos1 = writeOutput(pos1, j_temp1, rafOut);//escrever no arquivo de output 
 							controle3++;
 							count1++;
-						}
+						}*/
 						
-					} else if (condicao2){//se o primeiro não existir mas o segundo existir
+					} /*else if (condicao2 && pos2 != raf2.length()){//se o primeiro não existir mas o segundo existir
+						System.out.println("jfklasdjflkaujioejnflkhcioueshfcomeojfriouashv");
+						tamanho = raf2.readInt();
+						ba2 = new byte[tamanho];					
+						raf2.read(ba2);
+						j_temp2.fromByteArray(ba2);//transformando em objeto
+						
+
+						pos2 = writeOutput(pos2, j_temp2, rafOut);//escrever no arquivo de output
+						controle3 ++;
+						count2++;
+					}*/
+
+					else if (condicao1){
+						tamanho = raf1.readInt();
+
+						ba1 = new byte[tamanho];					
+						raf1.read(ba1);
+
+						j_temp1.fromByteArray(ba1);//transformando em objeto
+
+						pos1 = writeOutput(pos1, j_temp1, rafOut);//escrever no arquivo de output 
+						controle3++;
+						count1++;
+					} else if (condicao2){
 						tamanho = raf2.readInt();
 						ba2 = new byte[tamanho];					
 						raf2.read(ba2);

@@ -109,6 +109,7 @@ public class CRUD {
 		return null;
 	}
 
+
 	public void atualizar(int id) throws IOException {
 		Scanner sc = new Scanner(System.in);
 		int posicao = apontar(id);
@@ -277,6 +278,8 @@ public class CRUD {
 		} else {
 			System.out.println("ERRO: ITEM NÃO ENCONTRADO");
 		}
+
+		
 		return j_temp;
 	}
 
@@ -298,22 +301,27 @@ public class CRUD {
 
 				
 					j_temp.fromByteArray(ba);	
-				
-					if (i < 500) {
+
+					//if (i == 0) {
 						System.out.println(j_temp);
 						//System.out.println("lido " + i + " registros");
 						//System.out.println(arq.getFilePointer());
 						//System.out.println(arq.length() - 1);
-					}
+						
+					//}
 				} else {
 					System.out.println(j_temp);
 					System.out.println("lido " + i + " registros");
+					
 					//System.out.println(arq.getFilePointer());
 					//System.out.println(arq.length() - 1);
+					
 
 					return;
 				}
 			}
+
+			
 		
 		System.out.println("lido " + i + " registros");
 	}
@@ -363,6 +371,22 @@ public class CRUD {
 		return -1;
 	}
 
+	public int[] aleatorizar (int max){
+		int[] numbers = new int[10065];
+        for (int i = 0; i < numbers.length; i++) {
+            numbers[i] = i;
+        }
+        Random rand = new Random();
+        for (int i = numbers.length - 1; i > 0; i--) {
+            int j = rand.nextInt(i + 1);
+            int temp = numbers[i];
+            numbers[i] = numbers[j];
+            numbers[j] = temp;
+        }
+
+		return numbers;
+	}
+
 	public static List<Movie> readCsv(String filename) {
 		List<Movie> filmes = new ArrayList<>();
 		int id = 10064;
@@ -398,6 +422,66 @@ public class CRUD {
 		// RandomAccessFile fos = new
 		// RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", rw");
 		List<Movie> filmes = readCsv("../data/movies.csv");
+		byte ba[];
+		try {
+			if (file.length() == 0) {
+				file.seek(0);
+				file.writeInt(filmes.size() - 1); // cabaço
+			} else {
+				file.seek(4);
+			}
+			for (int i = 0; i < filmes.size(); i++) {
+				// System.out.println("Posicao do registro: " + fos.getFilePointer());
+				ba = filmes.get(i).toByteArray();
+				if (i < 10) {
+					// System.out.println(ba.length);
+				}
+				file.writeInt(ba.length); // escreve tamanho da entidade
+				file.write(ba); // escreve o byte de arrays da entidade
+				// inserir(ba);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return;
+	}
+
+	public static List<Movie> readCsv(String filename, int[] id) {
+		List<Movie> filmes = new ArrayList<>();
+		int controle = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
+			String line;
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+				String[] atributos = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+				// o regex acima divide a linha em campos, ignorando as vírgulas entre aspas
+				String title = atributos[0];
+				int year = 0;
+				if (atributos[1].length() == 4) {
+					year = Integer.parseInt(atributos[1]);
+				} else {
+					year = Integer.parseInt(atributos[1].substring(atributos[1].length() - 4));
+				}
+				String certificate = atributos[2];
+				String[] genre = atributos[3].replaceAll("^\"|\"$", "").split(",");
+				float rating = Float.parseFloat(atributos[4]);
+				String director = atributos[5];
+				Movie filme = new Movie(false, id[controle], title, year, certificate, genre, rating, director);
+				controle++;
+				filmes.add(filme);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return filmes;
+	}
+
+	public void cargaInicialRandom() {
+		// RandomAccessFile fos = new
+		// RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", rw");
+		int[] id = aleatorizar(10064);
+		List<Movie> filmes = readCsv("../data/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {

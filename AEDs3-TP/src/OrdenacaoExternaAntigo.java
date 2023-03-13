@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.*;
 
-public class OrdenacaoExterna {
+public class OrdenacaoExternaAntigo {
 
 	public static void sortInit(String filename, int m, int n) throws IOException {
 		CRUD crud = new CRUD("../data/arquivo.bin");
@@ -163,17 +163,14 @@ public class OrdenacaoExterna {
 					controle3 = 0;
 				}
 
-				if (k == 0){
+				
 					System.out.println("raf1 = " + inputFiles[controle1    ]);
 					System.out.println("raf2 = " + inputFiles[controle1  +1  ]);
 					System.out.println("rafOut = " + inputFiles[controle2    ]);
-				}
 				
-				//System.out.println("controle3 = " + controle3);
 				
-					
 				//for do interior de cada bloco	
-				for (int j = 0; j < interiorBloco ; j++) {			
+				for (int j = 0; j < interiorBloco; j++) {		
 					
 					
 					//System.out.println("controle2 = " + controle2);
@@ -192,15 +189,27 @@ public class OrdenacaoExterna {
 					raf2.seek(0);
 					int size2 = raf2.readInt();
 
-					if ((k == quantBloco-1) && (size1 != regPorArq)){
-						System.out.println("acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + size1);
-						System.out.println("interiorBloco = " + interiorBloco);
-						condicao1 = (count1 < (interiorBloco - (diferenca)) );
+					if ((k == quantBloco-1) && ((size1 + (diferenca+1) == regPorArq) || (size1 - (diferenca +1)== regPorArq))){
+						//System.out.println("acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + size1);
+						//System.out.println("interiorBloco = " + regPorArq);
+						//System.out.println("diferenca = " + diferenca);
+
+						//System.out.println("interiorBloco = " + (Math.ceil((double)size1/(double)quantBloco)));
+						if ((size1 + (diferenca+1) == regPorArq)){
+							condicao1 = ((count1 < ((interiorBloco) - (diferenca)) ) && raf1.getFilePointer() < raf1.length() - 4);
+						}else {
+							condicao1 = ((count1 < ((interiorBloco) + (diferenca)) ) && raf1.getFilePointer() < raf1.length() - 4);
+						}
 						//condicao2 = (count2 < interiorBloco-1);
-					} else if ((k == quantBloco-1) && (size2 != regPorArq)){
+					} else if ((k == quantBloco-1) && ((size2 + (diferenca +1) == regPorArq) || (size2 - (diferenca +1) == regPorArq))){
 						//condicao1 = (count1 < interiorBloco-1);
-						condicao2 = (count2 < (interiorBloco - (diferenca)) );
+						if (size2 + (diferenca +1) == regPorArq){
+							condicao2 = ((count2 < ((interiorBloco) - (diferenca)) ) && raf2.getFilePointer() < raf2.length() - 4);
+						} else {
+							condicao2 = ((count2 < ((interiorBloco) + (diferenca)) ) && raf2.getFilePointer() < raf2.length() - 4);
+						}
 					}
+
 
 					raf1.seek(pos1);
 					raf2.seek(pos2);
@@ -215,11 +224,11 @@ public class OrdenacaoExterna {
 					try{
 					//abre e salva o registro do arquivo de entrada
 					
-  					if (condicao1){
+  					if (condicao1 && raf1.getFilePointer() < raf1.length() - 4){
 					//lendo o registro do primeiro arquivo
 					tamanho = raf1.readInt();
 					if (tamanho < 500 && tamanho > 0){
-					System.out.println("tamanho = " + tamanho);
+					//System.out.println("tamanho = " + tamanho);
 					ba1 = new byte[tamanho];					
 					
 					raf1.read(ba1);
@@ -230,7 +239,7 @@ public class OrdenacaoExterna {
 					raf1.close();
 					
 						//confere se ainda existe alguma coisa no arquivo 2
-						if (condicao2) {
+						if (condicao2 && raf2.getFilePointer() < raf2.length() - 4) {
 
 							//abre e salva o registro do arquivo de entrada
 							
@@ -277,7 +286,7 @@ public class OrdenacaoExterna {
 								count1 = tmp[2];
 						}
 					}}catch (IOException e) {
-						if (condicao2){
+						if (condicao2 && raf2.getFilePointer() < raf2.length() - 4){
 							//abre e salva o registro do arquivo de entrada
 							
 
@@ -357,11 +366,10 @@ public class OrdenacaoExterna {
 			interiorBloco = interiorBloco*n;//mudar o tamanho de cada bloco de acordo com a fase
 			//System.out.println("interiorBloco = " + interiorBloco + "/// n = " + n);
 			System.out.println("regporarq = " + regPorArq);
-			quantBloco = (int)Math.floor((double)regPorArq/(double)interiorBloco);//mudar a quantidade de blocos por arquivo de acordo com a fase
+			quantBloco = (int)Math.ceil((double)regPorArq/(double)interiorBloco);//mudar a quantidade de blocos por arquivo de acordo com a fase
 			System.out.println("quantBloco = " + quantBloco);
 
-			System.out.println("arquivo escrito por ultimo = " + inputFiles[controle2]);
-		}//fim for de cada fase
+			System.out.println("arquivo escrito por ultimo = " + inputFiles[controle2]);		}//fim for de cada fase
 		crud.mostrarTudo(inputFiles[controle2], 4);
 		//crud.mostrarTudo("../data/arquivo4tmp.bin", 0);
 

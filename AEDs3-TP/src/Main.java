@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-		interfac();
+		interfac();  
 		try {
 			OrdenacaoExterna.sortInit("../data/arquivo", 1257, 2);
 		} catch (IOException e) {
@@ -25,6 +25,8 @@ public class Main {
 		try {
 			CRUD crud = new CRUD("../data/arquivo.bin");
 
+			
+
 			while (true) {
 				System.out.println("Selecione uma operação:");
 				System.out.println("1 - Listar");
@@ -33,6 +35,7 @@ public class Main {
 				System.out.println("4 - Excluir");
 				System.out.println("5 - Mostrar tudo");
 				System.out.println("6 - Carga inicial");
+				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -96,6 +99,11 @@ public class Main {
 						break;
 					case 6:
 						crud.cargaInicial();
+						System.out.println("Carga inicial realizada!");
+						System.out.println("Maior ID = " + crud.getMaxId());
+						break;
+					case 7:
+						crud.cargaInicialRandom();
 						System.out.println("Carga inicial realizada!");
 						System.out.println("Maior ID = " + crud.getMaxId());
 						break;
