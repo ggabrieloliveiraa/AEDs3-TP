@@ -164,9 +164,15 @@ public class OrdenacaoExterna {
 			
 			//for de cada bloco
 			for (int k = 0; k < quantBloco; k++) {	
+<<<<<<< Updated upstream
 				RandomAccessFile raf1   = new RandomAccessFile(inputFiles[controle1    ], "r" );
 				RandomAccessFile raf2   = new RandomAccessFile(inputFiles[controle1 + 1], "r" );
 				Files.delete(raf1);
+=======
+				File raf1   = new File(inputFiles[controle1    ], "r" );
+				File raf2   = new File(inputFiles[controle1 + 1], "r" );
+				raf1.delete();
+>>>>>>> Stashed changes
 				raf2.delete();
 				//organizar em qual arquivo vai ler e em qual vai escrever
 				if (i % 2 == 0) {
