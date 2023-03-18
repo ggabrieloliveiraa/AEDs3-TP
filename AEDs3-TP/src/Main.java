@@ -1,5 +1,5 @@
 import java.io.IOException;
-import java.io.*;
+
 import java.util.Scanner;
 
 public class Main {
@@ -10,8 +10,9 @@ public class Main {
 
 	public static void interfac() {
 		Scanner scanner = new Scanner(System.in);
+		
 		try {
-			CRUD crud = new CRUD("../data/arquivo.bin");
+			CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
 
 			while (true) {
 				System.out.println("Selecione uma operação:");
@@ -22,98 +23,98 @@ public class Main {
 				System.out.println("5 - Mostrar tudo");
 				System.out.println("6 - Carga inicial");
 				System.out.println("7 - Carga inicial com IDs aleatorios");
-				System.out.println("");
-				System.out.println("8 - Ordenacao externa");
+				System.out.println("8 - Ordenação externa");
 				System.out.println("0 - Sair");
-
+				
 				int id = 0;
 				Movie m_temp = new Movie();
 				int opcao = scanner.nextInt();
 				scanner.nextLine(); // limpa o buffer do scanner
 				switch (opcao) {
 
-					// listar
+				// listar
+				case 1:
+					System.out.println("1 - Buscar por ID");
+					System.out.println("2 - Buscar por título");
+
+					int opco = scanner.nextInt();
+					scanner.nextLine(); // limpa o buffer do scanner
+					switch (opco) {
 					case 1:
-						System.out.println("1 - Buscar por ID");
-						System.out.println("2 - Buscar por título");
-
-						int opco = scanner.nextInt();
-						scanner.nextLine(); // limpa o buffer do scanner
-						switch (opco) {
-							case 1:
-								System.out.println("Maior ID = " + crud.getMaxId());
-								System.out.println("Qual ID você deseja mostrar?");
-								id = scanner.nextInt();
-								m_temp = crud.buscar(id);
-								break;
-							case 2:
-								System.out.println("Qual título você deseja mostrar?");
-								String title = scanner.nextLine();
-								m_temp = crud.buscar(title);
-								break;
-							default:
-								System.out.println("ERRO: opcao invalida");
-						}
-						if (m_temp != null) {
-							System.out.println(m_temp);
-						} else {
-							System.out.println("ERRO: filme não encontrado!");
-						}
-
+						System.out.println("Maior ID = " + crud.getMaxId());
+						System.out.println("Qual ID você deseja mostrar?");
+						id = scanner.nextInt();
+						m_temp = crud.buscar(id);
 						break;
-
-					// inserir
 					case 2:
-						m_temp = getMovie();
-
-						crud.inserir(m_temp.toByteArray());
+						System.out.println("Qual título você deseja mostrar?");
+						String title = scanner.nextLine();
+						m_temp = crud.buscar(title);
 						break;
-
-					// atualizar
-					case 3:
-						System.out.println("Qual ID do filme que voce deseja atualizar?");
-						id = scanner.nextInt();
-						crud.atualizar(id);
-						break;
-
-					// remover
-					case 4:
-						System.out.println("Qual ID você deseja remover?");
-						id = scanner.nextInt();
-						m_temp = crud.remover(id);
-						break;
-					case 5:
-						crud.mostrarTudo("../data/arquivo.bin", 4);
-						break;
-					case 6:
-						crud.cargaInicial();
-						System.out.println("Carga inicial realizada!");
-						System.out.println("Maior ID = " + crud.getMaxId());
-						break;
-					case 7:
-						crud.cargaInicialRandom();
-						System.out.println("Carga inicial realizada!");
-						System.out.println("Maior ID = " + crud.getMaxId());
-						break;
-					case 8:
-						try {
-							OrdenacaoExterna.externalSort("../data/arquivo", 2517, 2);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						break;
-					case 0:
-						System.out.println("Saindo...");
-						crud.fechar();
-						return;
 					default:
-						System.out.println("Opção inválida!");
+						System.out.println("ERRO: opcao invalida");
+					}
+					if (m_temp != null) {
+						System.out.println(m_temp);
+					} else {
+						System.out.println("ERRO: filme não encontrado!");
+					}
+
+					break;
+
+				// inserir
+				case 2:
+					m_temp = getMovie();
+
+					crud.inserir(m_temp.toByteArray());
+					break;
+
+				// atualizar
+				case 3:
+					System.out.println("Qual ID do filme que voce deseja atualizar?");
+					id = scanner.nextInt();
+					crud.atualizar(id);
+					break;
+
+				// remover
+				case 4:
+					System.out.println("Qual ID você deseja remover?");
+					id = scanner.nextInt();
+					m_temp = crud.remover(id);
+					break;
+				case 5:
+					crud.mostrarTudo("arquivo.bin", 4);
+					break;
+				case 6:
+					crud.cargaInicial();
+					System.out.println("Carga inicial realizada!");
+					System.out.println("Maior ID = " + crud.getMaxId());
+					break;
+				case 7:
+					crud.cargaInicialRandom();
+					System.out.println("Carga inicial realizada!");
+					System.out.println("Maior ID = " + crud.getMaxId());
+					break;
+				case 8:
+					try {
+						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
+						System.out.println("ARQUIVO ORDENADO!");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					interfac();
+					return;
+				case 0:
+					System.out.println("Saindo...");
+					crud.fechar();
+					return;
+				default:
+					System.out.println("Opção inválida!");
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		scanner.close();
 	}
 
 	// pegar cada atributo do filme por input do terminal
@@ -123,7 +124,6 @@ public class Main {
 		String title, director;
 
 		float rating;
-		// java.util.Date year;
 		int id = 0;
 
 		System.out.println("Digite o título do filme: ");
@@ -143,24 +143,23 @@ public class Main {
 
 		String certificado = " ";
 		switch (escolha) {
-			case 1:
-				certificado = "A";
-				break;
-			case 2:
-				certificado = "PG-13";
-				break;
-			case 3:
-				certificado = "R";
-				break;
-			case 4:
-				certificado = "U";
-				break;
-			case 5:
-				certificado = "UA";
-				break;
-			default:
-				System.out.println("Opção inválida!");
-				// break;
+		case 1:
+			certificado = "A";
+			break;
+		case 2:
+			certificado = "PG-13";
+			break;
+		case 3:
+			certificado = "R";
+			break;
+		case 4:
+			certificado = "U";
+			break;
+		case 5:
+			certificado = "UA";
+			break;
+		default:
+			System.out.println("Opção inválida!");
 		}
 
 		System.out.println("Digite quantos gêneros o filmes vai ter");
@@ -178,11 +177,8 @@ public class Main {
 
 		System.out.println("Digite o ano de lançamento do filme (YYYY)");
 		int date = sc.nextInt();
-		// Date year = new Date();// por enquanto deixei assim(atributos[1])
-		// id = 10064;
 
 		Movie filme = new Movie(false, id, title, date, certificado, genre, rating, director);
-		// sc.close();
 		return filme;
 
 	}
