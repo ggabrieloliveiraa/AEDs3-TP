@@ -304,7 +304,7 @@ public class CRUD {
 
 					//if (i == 0) {
 						System.out.println(j_temp);
-						//System.out.println("lido " + i + " registros");
+						System.out.println("lido " + i + " registros");
 						//System.out.println(arq.getFilePointer());
 						//System.out.println(arq.length() - 1);
 						
