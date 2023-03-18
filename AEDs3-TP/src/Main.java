@@ -6,6 +6,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		interfac();
+		try {
+			OrdenacaoExterna.externalSort("../data/arquivo", 2517, 2);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void interfac() {
@@ -97,7 +102,7 @@ public class Main {
 					break;
 				case 8:
 					try {
-						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
+						OrdenacaoExterna.externalSort("../data/arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
 						System.out.println("ARQUIVO ORDENADO!");
 					} catch (IOException e) {
 						e.printStackTrace();

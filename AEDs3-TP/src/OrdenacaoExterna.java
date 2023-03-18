@@ -39,7 +39,7 @@ public class OrdenacaoExterna {
 		}
 		RandomAccessFile input = new RandomAccessFile(filename + ".bin", "rw");
 		for (int i = 0; i < n; i++) { // cria os n arquivos
-			RandomAccessFile output = new RandomAccessFile(filename + (i + 1) + "tmp.bin", "rw");
+			RandomAccessFile output = new RandomAccessFile("../data/" + filename + (i + 1) + "tmp.bin", "rw");
 			arqs[i] = filename + (i + 1) + "tmp.bin";
 			output.close();
 		}
@@ -65,8 +65,8 @@ public class OrdenacaoExterna {
 			pos[controle % n] = distribuir(tamanhos, filmes, filename, (controle % n) + 1, pos[controle % n]);
 			controle++;
 		}
-		CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
-		// crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo2tmp.bin", 0);
+		CRUD crud = new CRUD("../data/arquivo.bin");
+		// crud.mostrarTudo("../data/arquivo2tmp.bin", 0);
 		intercalacaoBalanceada(arqs, m);
 		input.close();
 	}
@@ -84,7 +84,7 @@ public class OrdenacaoExterna {
 		CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
 		int maxId = crud.getMaxId();
 		int n = inputFiles.length;
-		String filename = "/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo";
+		String filename = "../data/arquivo"; 
 		String[] arqS = new String[n * 2];
 		for (int i = 0; i < n; i++) {
 			arqS[i] = inputFiles[i];
@@ -248,9 +248,9 @@ public class OrdenacaoExterna {
 		
 		RandomAccessFile in = new RandomAccessFile(arquivoFinal, "r");
 		// crud.mostrarTudo(arquivoFinal, 0);
-		File aaaaaaaa = new File("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+		File aaaaaaaa = new File("../data/arquivo.bin");
 		aaaaaaaa.delete();
-		RandomAccessFile out = new RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin", "rw");
+		RandomAccessFile out = new RandomAccessFile("../data/arquivo.bin", "rw");
 		out.writeInt(maxId);
 		byte[] buffer = new byte[1024];
 

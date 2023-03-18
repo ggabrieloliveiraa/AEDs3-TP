@@ -328,7 +328,7 @@ public class CRUD {
 	}
 
 	public void cargaInicial() {
-		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
+		List<Movie> filmes = readCsv("../data/movies.csv");
 		byte ba[];
 		try {
 			if (file.length() == 0) {
@@ -364,7 +364,7 @@ public class CRUD {
 	}
 
 	public void mostrarTudo(String filename, int pos) throws IOException {
-		RandomAccessFile arq = new RandomAccessFile(filename, "rw");
+		RandomAccessFile arq = new RandomAccessFile("../data/" + filename, "rw");
 		Movie j_temp = new Movie();
 		arq.seek(pos);
 		int tamanho = 0;
@@ -392,7 +392,7 @@ public class CRUD {
 
 	public void cargaInicialRandom() {
 		int[] id = aleatorizar(10064);
-		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", id);
+		List<Movie> filmes = readCsv("../data/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {
