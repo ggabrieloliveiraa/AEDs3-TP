@@ -6,9 +6,10 @@ import java.util.*;
 
 public class CRUD {
 	private RandomAccessFile file;
+	
 
 	public CRUD(String nomeArquivo) throws IOException {
-		String tmp = "../data/" + nomeArquivo;
+		String tmp = nomeArquivo;
 		this.file = new RandomAccessFile(tmp, "rw");
 	}
 
@@ -83,7 +84,7 @@ public class CRUD {
 			tamanho = file.readInt();
 			ba = new byte[tamanho];
 			file.seek(posicao + 4);
-			// System.out.println("posicao = " + file.getFilePointer());
+			System.out.println("posicao = " + file.getFilePointer());
 			file.read(ba);
 			j_temp.fromByteArray(ba);
 			return j_temp;
@@ -134,98 +135,96 @@ public class CRUD {
 			sc.nextLine(); // limpa o buffer do scanner
 			switch (opcao) {
 
+			case 1:
+				System.out.println("Novo título: ");
+				tmp = sc.nextLine();
+
+				j_temp.title = tmp;
+
+				break;
+
+			case 2:
+				System.out.println("Novo diretor: ");
+				tmp = sc.nextLine();
+
+				j_temp.director = tmp;
+
+				break;
+
+			case 3:
+				System.out.println("Escolha o certificado de classificação etária para o filme:");
+				System.out.println("1 - A (all ages)");
+				System.out.println("2 - PG-13");
+				System.out.println("3 - R");
+				System.out.println("4 - U");
+				System.out.println("5 - UA");
+
+				int escolha = sc.nextInt();
+				switch (escolha) {
 				case 1:
-					System.out.println("Novo título: ");
-					tmp = sc.nextLine();
-
-					j_temp.title = tmp;
-
+					tmp = "A";
 					break;
-
 				case 2:
-					System.out.println("Novo diretor: ");
-					tmp = sc.nextLine();
-
-					j_temp.director = tmp;
-
+					tmp = "PG-13";
 					break;
-
 				case 3:
-					System.out.println("Escolha o certificado de classificação etária para o filme:");
-					System.out.println("1 - A (all ages)");
-					System.out.println("2 - PG-13");
-					System.out.println("3 - R");
-					System.out.println("4 - U");
-					System.out.println("5 - UA");
-
-					int escolha = sc.nextInt();
-					switch (escolha) {
-						case 1:
-							tmp = "A";
-							break;
-						case 2:
-							tmp = "PG-13";
-							break;
-						case 3:
-							tmp = "R";
-							break;
-						case 4:
-							tmp = "U";
-							break;
-						case 5:
-							tmp = "UA";
-							break;
-						default:
-							System.out.println("Opção inválida!");
-							// break;
-					}
-
-					j_temp.certificate = tmp;
-
+					tmp = "R";
 					break;
-
 				case 4:
-					// ler os generos
-					System.out.println("Digite quantos gêneros o filmes vai ter");
-					int k = sc.nextInt();
-
-					String[] genre = new String[k];
-					sc.nextLine();
-					for (int i = 0; i < k; i++) {
-						System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
-						genre[i] = sc.nextLine();
-					}
-
-					// verificar se cabe
-					file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length()
-							+ j_temp.certificate.length());
-
-					j_temp.genre = genre;
-
+					tmp = "U";
 					break;
-
 				case 5:
-					float rating;
-					System.out.println("Digite a avaliação do filme, separado por vírgula");
-					rating = sc.nextFloat();
-					j_temp.rating = rating;
+					tmp = "UA";
 					break;
-
-				case 6:
-					System.out.println("Digite o ano de lançamento do filme");
-					int date = sc.nextInt();
-					j_temp.year = Movie.parseDate(date);
-					break;
-
-				case 0:
-					remover(id);
-					inserir(j_temp.toByteArray());
-					System.out.println("Saindo...");
-					return;
 				default:
 					System.out.println("Opção inválida!");
+					// break;
+				}
+
+				j_temp.certificate = tmp;
+
+				break;
+
+			case 4:
+				// ler os generos
+				System.out.println("Digite quantos gêneros o filmes vai ter");
+				int k = sc.nextInt();
+
+				String[] genre = new String[k];
+				sc.nextLine();
+				for (int i = 0; i < k; i++) {
+					System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
+					genre[i] = sc.nextLine();
+				}
+
+				// verificar se cabe
+				file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() + j_temp.certificate.length());
+
+				j_temp.genre = genre;
+
+				break;
+
+			case 5:
+				float rating;
+				System.out.println("Digite a avaliação do filme, separado por vírgula");
+				rating = sc.nextFloat();
+				j_temp.rating = rating;
+				break;
+
+			case 6:
+				System.out.println("Digite o ano de lançamento do filme");
+				int date = sc.nextInt();
+				j_temp.year = Movie.parseDate(date);
+				break;
+
+			case 0:
+				remover(id);
+				inserir(j_temp.toByteArray());
+				System.out.println("Saindo...");
+				return;
+			default:
+				System.out.println("Opção inválida!");
 			}
-			// sc.close();
 		}
 
 	}
@@ -299,7 +298,7 @@ public class CRUD {
 
 	public static List<Movie> readCsv(String filename) {
 		List<Movie> filmes = new ArrayList<>();
-		int id = 0;
+		int id = 10064;
 		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 			br.readLine(); // Ignora a primeira linha que contém cabeçalhos de coluna
 			String line;
@@ -319,7 +318,7 @@ public class CRUD {
 				float rating = Float.parseFloat(atributos[4]);
 				String director = atributos[5];
 				Movie filme = new Movie(false, id, title, year, certificate, genre, rating, director);
-				id++;
+				id--;
 				filmes.add(filme);
 			}
 		} catch (IOException e) {
@@ -329,17 +328,16 @@ public class CRUD {
 	}
 
 	public void cargaInicial() {
-		List<Movie> filmes = readCsv("../data/movies.csv");
+		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv");
 		byte ba[];
 		try {
 			if (file.length() == 0) {
 				file.seek(0);
-				file.writeInt(filmes.size() - 1); // cabaço
+				file.writeInt(filmes.size() - 1); // cabeçalho
 			} else {
 				file.seek(4);
 			}
 			for (int i = 0; i < filmes.size(); i++) {
-				// System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
 				file.writeInt(ba.length); // escreve tamanho da entidade
 				file.write(ba); // escreve o byte de arrays da entidade
@@ -378,7 +376,7 @@ public class CRUD {
 				byte ba[];
 				ba = new byte[tamanho];
 				arq.read(ba);
-
+				
 				j_temp.fromByteArray(ba);
 				System.out.println(j_temp);
 			} else {
@@ -387,29 +385,25 @@ public class CRUD {
 				return;
 			}
 		}
-
+		
 		System.out.println("lido " + i + " registros");
 		arq.close();
 	}
 
 	public void cargaInicialRandom() {
-		// RandomAccessFile fos = new
-		// RandomAccessFile("../data/movies.csv", rw");
 		int[] id = aleatorizar(10064);
-		List<Movie> filmes = readCsv("../data/movies.csv", id);
+		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {
 				file.seek(0);
-				file.writeInt(filmes.size() - 1); // cabaço
+				file.writeInt(filmes.size() - 1); // cabeçalho
 			} else {
 				file.seek(4);
 			}
 			for (int i = 0; i < filmes.size(); i++) {
-				// System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
 				if (i < 10) {
-					// System.out.println(ba.length);
 				}
 				file.writeInt(ba.length); // escreve tamanho da entidade
 				file.write(ba); // escreve o byte de arrays da entidade
