@@ -1,4 +1,5 @@
 import java.io.*;
+
 public class OrdenacaoExterna {
 	private static void quickSort(Movie[] vetor, int inicio, int fim) {
 		if (inicio < fim) {
@@ -61,7 +62,6 @@ public class OrdenacaoExterna {
 			quickSort(filmes, 0, filmes.length - 1); // ordena os blocos de tamanho m atributos em memoria principal
 			for (int i = 0; i < filmes.length; i++) {
 			}
-			System.out.println("!!!!");
 			pos[controle % n] = distribuir(tamanhos, filmes, filename, (controle % n) + 1, pos[controle % n]);
 			controle++;
 		}
@@ -97,14 +97,18 @@ public class OrdenacaoExterna {
 		byte[] ba1;
 		byte[] ba2;
 		byte[] baMenor;
+		int fds = 0;
 		Movie movieMenor = new Movie();
 		int[] tamanhos = new int[n];
 		Movie[] j_temp = new Movie[n];
+		Movie tmp = new Movie();
+		Movie tmp2 = new Movie();
 		for (int i = 0; i < n; i++) {
 			j_temp[i] = new Movie();
 		}
 		String arquivoFinal = "";
 		int passadas = calcularPassadas(m, n);
+		int lastDance = 0;
 		int tamS = m * n;
 		int proxS = m;
 		int controle1 = 0;
@@ -116,9 +120,7 @@ public class OrdenacaoExterna {
 		for (int i = 0; i < n; i++) {
 			posOut[i] = 0; // preenche ponteiros com 0
 		}
-		System.out.println("passadas = " + passadas);
 		double a = Math.ceil(((double) maxId + 1) / (double) n);
-		System.out.println("a = " + a);
 		RandomAccessFile[] rafIn = new RandomAccessFile[n * 2];
 		for (int i = 0; i < n * 2; i++) {
 			rafIn[i] = new RandomAccessFile(arqS[i], "r");
@@ -128,39 +130,29 @@ public class OrdenacaoExterna {
 				controle1 = 0;
 				controle2 = n;
 			} else {
-				System.out.println("i = " + i);
 				controle1 = n;
 				controle2 = 0;
 			}
 			for (int f = 0; f < n; f++) {
 				rafIn[f] = new RandomAccessFile(arqS[controle1 + f], "r");
-				System.out.println(arqS[controle1 + f]);
 			}
-			System.out.println("prox = " + proxS);
 			double dentroInter = Math.ceil(((double) a / (double) proxS));
-			System.out.println("dentro = " + dentroInter);
 			if (dentroInter == 1) {
 				flag++;
 			}
-			for (int k = 0; k < dentroInter && flag <= 1; k++) { // problema está nesse for
-				for (int j = 0; j < tamS; j++) {
+			for (int k = 0; k < dentroInter && flag <= 1; k++) { // quantas vezes vai trocar o arquivo de saida
+				for (int j = 0; j < tamS; j++) { // passar pelos registros(tamS = bloco * n)
 					if (controle2 > n + 1 && controle1 == 0) {
 						controle2 = n;
 					}
-					// System.out.println("out = " + arqS[controle2]);
-					// System.out.println("outra!!!!!!!!!!!!!");
-					// RandomAccessFile raf1 = new RandomAccessFile(arqS[controle1], "r");
-					// RandomAccessFile raf2 = new RandomAccessFile(arqS[controle1 + 1], "r");
 					RandomAccessFile rafOut = new RandomAccessFile(arqS[controle2], "rw");
 					rafOut.seek(posOut[k % n]); // seta o ponteiro do arquivo de saida certo
-					// raf1.seek(pos1);
-					// raf2.seek(pos2);
 					for (int b = 0; b < n; b = b + 2) { // roda os n caminhos procurando o menor id
-						if (b == 0) {
+						if (b == 0) { // se é o primeiro, seta o menor pra ser o segundo
 							movieMenor = j_temp[b + 1];
 						}
-						if (b + 1 == n) {
-							System.out.println("if impar");
+						if (b + 1 == n) { // se n for ímpar, quando chegar na última comparação não terá um par de
+											// blocos
 							tamanhos[b] = rafIn[b].readInt();
 							ba1 = new byte[tamanhos[b]];
 							rafIn[b].read(ba1);
@@ -170,20 +162,18 @@ public class OrdenacaoExterna {
 								arqMenor = b;
 							}
 						} else if (rafIn[b].getFilePointer() >= rafIn[b].length() && rafIn[b].length() != 0) {
-							System.out.println("if raf1 passou");
+							// se arquivo b já tiver acabado
 							tamanhos[b + 1] = rafIn[b + 1].readInt();
-							// System.out.println("t2 = " + tamanhos[b + 1]);
 							ba2 = new byte[tamanhos[b + 1]];
 							rafIn[b + 1].read(ba2);
 							j_temp[b + 1].fromByteArray(ba2);
-							if (j_temp[b + 1].id < movieMenor.id || cb[b + 1] != tamS / n || cb[b] == tamS / n) {
+							if ((j_temp[b + 1].id < movieMenor.id && cb[b + 1] != tamS / n) || cb[b] == tamS / n) {
 								movieMenor = j_temp[b + 1];
 								arqMenor = b + 1;
 							}
 						} else if (rafIn[b + 1].getFilePointer() >= rafIn[b + 1].length()
+								// se arquivo b+1 já tiver acabado
 								&& rafIn[b + 1].length() != 0) {
-							// System.out.println("if raf2 passou");
-
 							tamanhos[b] = rafIn[b].readInt();
 							ba1 = new byte[tamanhos[b]];
 							rafIn[b].read(ba1);
@@ -192,25 +182,34 @@ public class OrdenacaoExterna {
 								movieMenor = j_temp[b];
 								arqMenor = b;
 							}
-						} else {
-
+						} else { // se os dois arquivos ainda tiverem registros
+							// System.out.println("fp1 = " + rafIn[b].getFilePointer());
+							// System.out.println("length1 = " + rafIn[b].length());
 							tamanhos[b] = rafIn[b].readInt();
+							// System.out.println("tamanho1 = " + tamanhos[b]);
+							// System.out.println("tamanho0 = " + tamanhos[b + 1]);
 							ba1 = new byte[tamanhos[b]];
 							rafIn[b].read(ba1);
 							j_temp[b].fromByteArray(ba1);
+							// System.out.println("fp2 = " + rafIn[b + 1].getFilePointer());
+							// System.out.println("length2 = " + rafIn[b + 1].length());
 							tamanhos[b + 1] = rafIn[b + 1].readInt();
+							// System.out.println("tamanho2 = " + tamanhos[b + 1]);
 							ba2 = new byte[tamanhos[b + 1]];
 							rafIn[b + 1].read(ba2);
+							// System.out.println("k = " + k);
 							j_temp[b + 1].fromByteArray(ba2);
 							baMenor = ba2;
 							if ((j_temp[b].id < movieMenor.id && cb[b] != tamS / n) || cb[b + 1] == tamS / n) {
 								// se o id desse arquivo for o menor e se ainda não tiver passado por todos os
 								// blocos
+								// System.out.println("j1 = " + j);
 								j_temp[b].fromByteArray(ba1);
 								movieMenor = j_temp[b];
 								baMenor = ba1;
 								arqMenor = b;
-							} else if (cb[b + 1] != tamS / n || cb[1] == tamS / n) {
+							} else if (cb[b + 1] != tamS / n || cb[b] == tamS / n) {
+								// System.out.println("j2 = " + j);
 								// se ainda nao tiver passado por todos os blocos
 								j_temp[b + 1].fromByteArray(ba2);
 								movieMenor = j_temp[b + 1];
@@ -218,26 +217,40 @@ public class OrdenacaoExterna {
 							}
 						}
 					}
+					if (j % 2 == 0) {
+						tmp2 = movieMenor;
+					}
 					baMenor = movieMenor.toByteArray();
-					rafOut.writeInt(baMenor.length);
-					rafOut.write(baMenor); // escreve o menor encontrado no arquivo de saida
+					if (tmp.id != movieMenor.id) // confere se o filme a ser inserido nao e
+																				// o msm da ultima insercao
+					{
+						rafOut.writeInt(baMenor.length);
+						rafOut.write(baMenor); // escreve o menor encontrado no arquivo de saida
+						//System.out.println("j = " +  j);
+						//System.out.println(movieMenor.id);
+					}
 					cb[arqMenor]++; // mostra que ja adicionou deste arquivo de entrada
+					tmp.fromByteArray(baMenor);
 					for (int b = 0; b < n; b++) {
 						if (b != arqMenor) { // volta com o ponteiro de todos, menos o que inseriu no arquivo
 							rafIn[b].seek(rafIn[b].getFilePointer() - tamanhos[b] - 4);
 						}
 					}
-					rafOut.close();
 					posOut[k % n] = (int) rafOut.getFilePointer();
 					arquivoFinal = arqS[controle2]; // ultimo arquivo salvo
 				}
 				for (int c = 0; c < cb.length; c++) {
 					cb[c] = 0; // reinicia o controlador de quantidade de entidades passadas por arquivo
 				}
+				// System.out.println(k);
 				controle2++;
 			}
 			proxS = proxS * n;
+			System.out.println("tamS = " + tamS);
 			tamS = tamS * n;
+			if (tamS > maxId) {
+				fds++;
+			}
 			for (int po = 0; po < n; po++) {
 				posOut[po] = 0; // reseta ponteiro do arquivo de saida
 			}
@@ -254,7 +267,6 @@ public class OrdenacaoExterna {
 		for (int i = 0; i < arqS.length; i++) // deleta os arquivos
 		{
 			File arquivo = new File(arqS[i]);
-			System.out.println(arqS[i]);
 			arquivo.delete();
 		}
 		in.close();
@@ -271,9 +283,6 @@ public class OrdenacaoExterna {
 				ba = filmes[i].toByteArray();
 				output.writeInt(ba.length);
 				output.write(ba);
-				if (i == 0 && n == 2) {
-					System.out.println(filmes[i]);
-				}
 			}
 		}
 		int resp = (int) output.getFilePointer();

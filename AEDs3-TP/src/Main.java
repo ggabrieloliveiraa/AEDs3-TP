@@ -6,12 +6,6 @@ public class Main {
 
 	public static void main(String[] args) {
 		interfac();
-		try {
-			OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 2517, 2);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		interfac();
 	}
 
 	public static void interfac() {
@@ -28,6 +22,7 @@ public class Main {
 				System.out.println("5 - Mostrar tudo");
 				System.out.println("6 - Carga inicial");
 				System.out.println("7 - Carga inicial com IDs aleatorios");
+				System.out.println("8 - Ordenação externa");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -99,6 +94,18 @@ public class Main {
 					System.out.println("Carga inicial realizada!");
 					System.out.println("Maior ID = " + crud.getMaxId());
 					break;
+				case 8:
+					//System.out.println("m = ");
+					//int m = scanner.nextInt();
+					//System.out.println("n = ");
+					//int n = scanner.nextInt();
+					try {
+						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 3715, 2);
+						System.out.println("ARQUIVO ORDENADO!");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					break;
 				case 0:
 					System.out.println("Saindo...");
 					crud.fechar();
@@ -110,7 +117,6 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		scanner.close();
 	}
 
 	// pegar cada atributo do filme por input do terminal
@@ -157,7 +163,6 @@ public class Main {
 			break;
 		default:
 			System.out.println("Opção inválida!");
-			// break;
 		}
 
 		System.out.println("Digite quantos gêneros o filmes vai ter");
@@ -175,11 +180,8 @@ public class Main {
 
 		System.out.println("Digite o ano de lançamento do filme (YYYY)");
 		int date = sc.nextInt();
-		// Date year = new Date();// por enquanto deixei assim(atributos[1])
-		// id = 10064;
 
 		Movie filme = new Movie(false, id, title, date, certificado, genre, rating, director);
-		sc.close();
 		return filme;
 
 	}

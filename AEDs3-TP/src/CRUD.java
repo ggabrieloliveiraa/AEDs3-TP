@@ -224,7 +224,6 @@ public class CRUD {
 			default:
 				System.out.println("Opção inválida!");
 			}
-			sc.close();
 		}
 
 	}
@@ -333,12 +332,11 @@ public class CRUD {
 		try {
 			if (file.length() == 0) {
 				file.seek(0);
-				file.writeInt(filmes.size() - 1); // cabaço
+				file.writeInt(filmes.size() - 1); // cabeçalho
 			} else {
 				file.seek(4);
 			}
 			for (int i = 0; i < filmes.size(); i++) {
-				// System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
 				file.writeInt(ba.length); // escreve tamanho da entidade
 				file.write(ba); // escreve o byte de arrays da entidade
@@ -392,23 +390,19 @@ public class CRUD {
 	}
 
 	public void cargaInicialRandom() {
-		// RandomAccessFile fos = new
-		// RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", rw");
 		int[] id = aleatorizar(10064);
 		List<Movie> filmes = readCsv("/home/gabriel/git/AEDs3-TP/AEDs3-TP/src/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {
 				file.seek(0);
-				file.writeInt(filmes.size() - 1); // cabaço
+				file.writeInt(filmes.size() - 1); // cabeçalho
 			} else {
 				file.seek(4);
 			}
 			for (int i = 0; i < filmes.size(); i++) {
-				// System.out.println("Posicao do registro: " + fos.getFilePointer());
 				ba = filmes.get(i).toByteArray();
 				if (i < 10) {
-					// System.out.println(ba.length);
 				}
 				file.writeInt(ba.length); // escreve tamanho da entidade
 				file.write(ba); // escreve o byte de arrays da entidade
