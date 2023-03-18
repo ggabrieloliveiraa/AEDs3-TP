@@ -10,6 +10,7 @@ public class Main {
 
 	public static void interfac() {
 		Scanner scanner = new Scanner(System.in);
+		
 		try {
 			CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
 

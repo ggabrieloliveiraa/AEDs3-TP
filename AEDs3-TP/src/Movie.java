@@ -74,9 +74,9 @@ public class Movie {
 		stringzona = stringzona.substring(0, stringzona.length() - 1);
 		dos.writeFloat(rating);
 		dos.writeLong(year.getTime());
-
 		return baos.toByteArray();
 	}
+	
 
 	public void fromByteArray(byte ba[]) throws IOException {
 

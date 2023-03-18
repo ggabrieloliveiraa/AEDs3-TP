@@ -6,6 +6,7 @@ import java.util.*;
 
 public class CRUD {
 	private RandomAccessFile file;
+	
 
 	public CRUD(String nomeArquivo) throws IOException {
 		String tmp = nomeArquivo;

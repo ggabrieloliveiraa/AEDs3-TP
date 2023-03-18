@@ -245,6 +245,7 @@ public class OrdenacaoExterna {
 				posOut[po] = 0; // reseta ponteiro do arquivo de saida
 			}
 		}
+		
 		RandomAccessFile in = new RandomAccessFile(arquivoFinal, "r");
 		// crud.mostrarTudo(arquivoFinal, 0);
 		File aaaaaaaa = new File("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
