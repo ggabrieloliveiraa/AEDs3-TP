@@ -85,7 +85,7 @@ public class Movie {
 
 		lapide = dis.readBoolean();
 		id = dis.readInt();
-		//System.out.println("id = " + id);
+		// System.out.println("id = " + id);
 		title = dis.readUTF();
 		director = dis.readUTF();
 		byte[] stringBytes = new byte[9];
@@ -96,7 +96,6 @@ public class Movie {
 		genre = allGen.split(",");
 		rating = dis.readFloat();
 		year = new Date(dis.readLong());
-
 
 	}
 }

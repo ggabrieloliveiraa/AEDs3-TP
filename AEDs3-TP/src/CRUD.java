@@ -375,7 +375,7 @@ public class CRUD {
 				byte ba[];
 				ba = new byte[tamanho];
 				arq.read(ba);
-
+				
 				j_temp.fromByteArray(ba);
 				System.out.println(j_temp);
 			} else {
@@ -384,7 +384,7 @@ public class CRUD {
 				return;
 			}
 		}
-
+		
 		System.out.println("lido " + i + " registros");
 		arq.close();
 	}

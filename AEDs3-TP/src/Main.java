@@ -24,7 +24,7 @@ public class Main {
 				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("8 - Ordenação externa");
 				System.out.println("0 - Sair");
-
+				
 				int id = 0;
 				Movie m_temp = new Movie();
 				int opcao = scanner.nextInt();
@@ -95,17 +95,14 @@ public class Main {
 					System.out.println("Maior ID = " + crud.getMaxId());
 					break;
 				case 8:
-					//System.out.println("m = ");
-					//int m = scanner.nextInt();
-					//System.out.println("n = ");
-					//int n = scanner.nextInt();
 					try {
-						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 2517, 2);
+						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
 						System.out.println("ARQUIVO ORDENADO!");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					break;
+					interfac();
+					return;
 				case 0:
 					System.out.println("Saindo...");
 					crud.fechar();
@@ -126,7 +123,6 @@ public class Main {
 		String title, director;
 
 		float rating;
-		// java.util.Date year;
 		int id = 0;
 
 		System.out.println("Digite o título do filme: ");
