@@ -10,7 +10,7 @@ public class OrdenacaoExterna {
 		String[] arqs = createFiles(n+2, filename);
 		populateSortFiles (input, arqs, m, n, filename, crud.getMaxId());
 		//crud.mostrarTudo("../data/arquivo1tmp.bin", 4);
-		intercalacaoBalanceada2(arqs, m, n);
+		intercalacaoBalanceada(arqs, m, n);
 		input.close();
 		System.out.println("fechou");
 		//crud.mostrarTudo("../data/arquivo2tmp.bin", 0);
@@ -164,6 +164,10 @@ public class OrdenacaoExterna {
 			
 			//for de cada bloco
 			for (int k = 0; k < quantBloco; k++) {	
+				RandomAccessFile raf1   = new RandomAccessFile(inputFiles[controle1    ], "r" );
+				RandomAccessFile raf2   = new RandomAccessFile(inputFiles[controle1 + 1], "r" );
+				Files.delete(raf1);
+				raf2.delete();
 				//organizar em qual arquivo vai ler e em qual vai escrever
 				if (i % 2 == 0) {
 					controle1 = 0;
@@ -368,7 +372,7 @@ public class OrdenacaoExterna {
 		//crud.mostrarTudo("../data/arquivo4tmp.bin", 0);
 
 	}
-
+/*
 	private static void intercalacaoBalanceada2(String[] inputFiles, int m, int n) throws IOException {
 		//variaveis usadas no geral
 		CRUD crud = new CRUD("../data/arquivo.bin");
@@ -544,7 +548,7 @@ public class OrdenacaoExterna {
 	}
     crud.mostrarTudo(inputFiles[controle2], 4);
 }
-
+*/
 	
 /*
 	private static void intercalacaoBalanceada(String[] inputFiles, int m, int n) throws IOException {
