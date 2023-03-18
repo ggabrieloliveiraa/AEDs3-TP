@@ -151,6 +151,7 @@ public class OrdenacaoExterna {
 						if (b == 0) { // se é o primeiro, seta o menor pra ser o segundo
 							movieMenor = j_temp[b + 1];
 						}
+						
 						if (b + 1 == n) { // se n for ímpar, quando chegar na última comparação não terá um par de
 											// blocos
 							tamanhos[b] = rafIn[b].readInt();

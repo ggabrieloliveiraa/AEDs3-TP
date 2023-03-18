@@ -100,7 +100,7 @@ public class Main {
 					//System.out.println("n = ");
 					//int n = scanner.nextInt();
 					try {
-						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 3715, 2);
+						OrdenacaoExterna.externalSort("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo", 2517, 2);
 						System.out.println("ARQUIVO ORDENADO!");
 					} catch (IOException e) {
 						e.printStackTrace();
