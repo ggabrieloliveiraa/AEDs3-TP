@@ -160,20 +160,14 @@ public class OrdenacaoExterna {
 			pos2 = 4;//resetar pra nova passada
 			bloco = 0;
 
+			File rafout   = new File(inputFiles[controle2    ], "rw" );
+			rafout.delete();
+
 			//System.out.println("passadas = " + i);
 			
 			//for de cada bloco
 			for (int k = 0; k < quantBloco; k++) {	
-<<<<<<< Updated upstream
-				RandomAccessFile raf1   = new RandomAccessFile(inputFiles[controle1    ], "r" );
-				RandomAccessFile raf2   = new RandomAccessFile(inputFiles[controle1 + 1], "r" );
-				Files.delete(raf1);
-=======
-				File raf1   = new File(inputFiles[controle1    ], "r" );
-				File raf2   = new File(inputFiles[controle1 + 1], "r" );
-				raf1.delete();
->>>>>>> Stashed changes
-				raf2.delete();
+				
 				//organizar em qual arquivo vai ler e em qual vai escrever
 				if (i % 2 == 0) {
 					controle1 = 0;
@@ -189,8 +183,7 @@ public class OrdenacaoExterna {
 				if (k%n != 0){
 					controle2++;
 					controle3 = 0;
-				}
-
+				}				
 				
 					System.out.println("raf1 = " + inputFiles[controle1    ]);
 					System.out.println("raf2 = " + inputFiles[controle1  +1  ]);
@@ -227,30 +220,30 @@ public class OrdenacaoExterna {
 					System.out.println("scr = " + scr);
 
 					if ((k == quantBloco-1) && ((size1 + (diferenca) == regPorArq) || (size1 - (diferenca)== regPorArq))){
-						System.out.println("AAA");
+						//System.out.println("AAA");
 
 						if ((size1 + (diferenca+1) == regPorArq)){
 							condicao1 = ((count1 < ((interiorBloco) - (diferenca)) ) && (raf1.getFilePointer() < raf1.length() - 6));
-							System.out.println("AAA1");
+							//System.out.println("AAA1");
 
 						}else {
 							condicao1 = ((count1 < ((interiorBloco) + (diferenca)) ) && (raf1.getFilePointer() < raf1.length() - 6));
-							System.out.println("AAA2");
+							//System.out.println("AAA2");
 
 						}
 						//condicao2 = (count2 < interiorBloco-1);
 					} else if ((k == quantBloco-1) && ((size2 + (diferenca) == regPorArq) || (size2 - (diferenca) == regPorArq))){
 						//System.out.println("bfjkldsafkljsadklfjalksfjlkasfjlk");
-						System.out.println("BBB");
+						//System.out.println("BBB");
 
 						//condicao1 = (count1 < interiorBloco-1);
 						if (size2 + (diferenca +1) == regPorArq){
 							condicao2 = ((count2 < ((interiorBloco) - (diferenca)) ) && raf2.getFilePointer() < raf2.length() - 6);
-							System.out.println("BBB1");
+							//System.out.println("BBB1");
 
 						} else {
 							condicao2 = ((count2 < ((interiorBloco) + (diferenca)) ) && raf2.getFilePointer() < raf2.length() - 6);
-							System.out.println("BBB2");
+							//System.out.println("BBB2");
 
 						}
 					}
@@ -262,10 +255,10 @@ public class OrdenacaoExterna {
 					//apontar corretamente pra posicao do rafOut
 					if (k % 2 == 0) {
 						rafOut.seek(posOut1);//se for par continua de onde parou anteriormente
-						System.out.println("rafout1 = " + posOut1);
+						//System.out.println("rafout1 = " + posOut1);
 					} else {
 						rafOut.seek(posOut2);//se for impar continua de onde parou anteriormente
-						System.out.println("rafout2 = " + posOut2);
+						//System.out.println("rafout2 = " + posOut2);
 
 					}
 
@@ -280,8 +273,13 @@ public class OrdenacaoExterna {
 
 					System.out.println("condicao1 = " + condicao1);
 					System.out.println("condicao2 = " + condicao2);
+
+					System.out.println("raf1 = " + inputFiles[controle1    ]);
+					System.out.println("raf2 = " + inputFiles[controle1  +1  ]);
+					System.out.println("rafOut = " + inputFiles[controle2    ]);
 					
 					if (condicao1 && condicao2){//se o primeiro existir
+
 						System.out.println(" ");
 						System.out.println(" ");
 
@@ -297,6 +295,7 @@ public class OrdenacaoExterna {
 						raf1.read(ba1);
 
 						j_temp1.fromByteArray(ba1);//transformando em objeto
+
 						
 						System.out.println("tamanho 1 " + raf1.length());
 						System.out.println("count 1 = " + count1);
@@ -305,12 +304,14 @@ public class OrdenacaoExterna {
 							
 						System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb count 2 = " + count2);
 						System.out.println("ponteiro 2 " + raf2.getFilePointer() + " -------------------------");
+
 						tamanho = raf2.readInt();
-						System.out.println("taaaaaaaaaamanho 2 " + tamanho);
+						//System.out.println("taaaaaaaaaamanho 2 " + tamanho);
 
 						ba2 = new byte[tamanho];					
 						raf2.read(ba2);
 						j_temp2.fromByteArray(ba2);//transformando em objeto
+
 						System.out.println("tamanho 2 " + raf2.length());
 						System.out.println("count 2 = " + count2);
 						System.out.println("id 2 =  " + j_temp2.id + " -------------------------");
@@ -366,6 +367,11 @@ public class OrdenacaoExterna {
 				count2 = 0;
 				
 			}//fim for de cada bloco
+
+			File raf1   = new File(inputFiles[controle1    ], "r" );
+			File raf2   = new File(inputFiles[controle1 + 1], "r" );
+			raf1.delete();
+			raf2.delete();
 			
 			interiorBloco = interiorBloco*n;//mudar o tamanho de cada bloco de acordo com a fase
 			System.out.println("regporarq = " + regPorArq);
@@ -378,6 +384,7 @@ public class OrdenacaoExterna {
 		//crud.mostrarTudo("../data/arquivo4tmp.bin", 0);
 
 	}
+
 /*
 	private static void intercalacaoBalanceada2(String[] inputFiles, int m, int n) throws IOException {
 		//variaveis usadas no geral
@@ -423,10 +430,27 @@ public class OrdenacaoExterna {
 			pos1 = 4;
 			pos2 = 4;//resetar pra nova passada
 
+			File rafout   = new File(inputFiles[controle2    ], "rw" );
+			rafout.delete();
+
 			//System.out.println("passadas = " + i);
 			
 			//for de cada bloco
 			for (int k = 0; k < quantBloco; k++) {	
+
+				//organizar em qual arquivo vai ler e em qual vai escrever
+				if (i % 2 == 0) {
+					controle1 = 0;
+					controle2 = n;
+				} else {
+					controle1 = n;
+					controle2 = 0;
+				}
+				
+				if (k%n != 0){
+					controle2++;
+				}
+
                 //for do interior de cada bloco	
 				for (int j = 0; j < interiorBloco || ((count1+count2) < interiorBloco); j++) {			
 
@@ -434,6 +458,8 @@ public class OrdenacaoExterna {
 					RandomAccessFile raf1   = new RandomAccessFile(inputFiles[controle1    ], "r" );
 					RandomAccessFile raf2   = new RandomAccessFile(inputFiles[controle1 + 1], "r" );
 					RandomAccessFile rafOut = new RandomAccessFile(inputFiles[controle2    ], "rw");
+					rafOut.seek(0);
+					rafOut.writeInt(0);
 
 					if (((count1 < interiorBloco) || raf1.getFilePointer() + 1 < raf1.length())){
 						condicao1 = true;
@@ -493,11 +519,13 @@ public class OrdenacaoExterna {
 
                     if (condicao1 && condicao2){//se o primeiro existir
                         tamanho = raf1.readInt();
+						System.out.println("tamanho 1 = " + tamanho);
                         ba1 = new byte[tamanho];					
 						raf1.read(ba1);
                         j_temp1.fromByteArray(ba1);//transformando em objeto
 
                         tamanho = raf2.readInt();
+						System.out.println("tamanho 2 = " + tamanho);
                         ba2 = new byte[tamanho];					
 						raf2.read(ba1);
                         j_temp2.fromByteArray(ba2);//transformando em objeto
@@ -548,6 +576,11 @@ public class OrdenacaoExterna {
 				count2 = 0;
                 
             }//fim for de cada bloco
+
+			File raf1   = new File(inputFiles[controle1    ], "r" );
+			File raf2   = new File(inputFiles[controle1 + 1], "r" );
+			raf1.delete();
+			raf2.delete();
 			
 			interiorBloco = interiorBloco*n;//mudar o tamanho de cada bloco de acordo com a fase
 			quantBloco = (int)Math.ceil((double)regPorArq/(double)interiorBloco);//mudar a quantidade de blocos por arquivo de acordo com a fase
