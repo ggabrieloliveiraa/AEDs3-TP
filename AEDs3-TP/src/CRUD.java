@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
 import java.util.*;
+import java.io.File;
 
 public class CRUD {
 	private RandomAccessFile file;
@@ -14,7 +15,13 @@ public class CRUD {
 		if (tipo == 1)
 		{
 			isHash = true;
-			this.hash = new Hash(false);
+			if (file.length() == 0){
+				cargaInicial();	
+				this.hash = new Hash(false);
+				System.out.println("CARGA INICIAL REALIZADA PARA CRIAR ARQUIVOS HASH");
+			} else {
+				this.hash = new Hash(false);
+			}
 		} else {
 			isHash = false;
 		}
@@ -106,7 +113,7 @@ public class CRUD {
 		}
 		int tamanho;
 
-		System.out.println(posicao);
+		//System.out.println(posicao);
 
 		byte ba[];
 		Movie j_temp = new Movie();

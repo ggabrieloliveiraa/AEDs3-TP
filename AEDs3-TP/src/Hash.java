@@ -26,7 +26,7 @@ public class Hash {
 		this.bucket = new RandomAccessFile("../data/bucket.bin", "rw");
 	    File b = new File("../data/bucket.bin");
 	    File d = new File ("../data/dir.bin");
-	    if (!b.exists()) {//se nao existir o arquivo
+	    if (dir.length() == 0) {//se nao existir o arquivo
 	    	alocarArquivos();
 	    }
 	    else if (isCargaInicial) { //se existir e for carga inicial
@@ -53,7 +53,7 @@ public class Hash {
 									// de
 									// indice
 			bucket.seek(endereco);
-			System.out.println(" e = " + endereco);
+			//System.out.println(" e = " + endereco);
 			bucket.writeInt(profundidade); // profundiade do diretorio = profundidade do bucket inicialmente
 			bucket.writeInt(0); // tamanho 0
 		}
@@ -68,7 +68,7 @@ public class Hash {
 		// System.out.println("id = " + id);
 		int hash = hash(id);
 		int dirPesq = 4 + (4 * hash);
-		System.out.println("disPesq = " + dirPesq);
+		//System.out.println("disPesq = " + dirPesq);
 		dir.seek(dirPesq); // vai pra posicao onde tem o endereco que aponta pro bucket(cabeçalho + 4 *
 								// tamanho endereço)
 		int bucketAdress = dir.readInt(); // ler o endereço que aponta pro bucket que quer
@@ -79,8 +79,8 @@ public class Hash {
 		int tamanho = bucket.readInt();
 		// System.out.println("tb = " + tamanho);
 		if (tamanho < 504) {
-			System.out.println("ba = " + bucketAdress);
-			System.out.println(id);
+			//System.out.println("ba = " + bucketAdress);
+			//System.out.println(id);
 			bucket.seek(bucket.getFilePointer() + (tamanho * 9));
 			bucket.writeInt(id);
 			bucket.writeBoolean(false); // lapide
@@ -89,7 +89,7 @@ public class Hash {
 			tamanho++;
 			bucket.writeInt(tamanho);
 		} else if (pBucket == profundidade) {
-			System.out.println("pbucket == profundidade");
+			//System.out.println("pbucket == profundidade");
 			// System.out.println("ba = " + bucketAdress);
 			// se profundidade local for igual a profundidade global, aumenta o diretorio
 			bucket.seek(bucket.getFilePointer() - 8);
@@ -107,7 +107,7 @@ public class Hash {
 			redistribuir(bucketPos);
 			inserir(id, false, pos);
 		} else {
-			System.out.println("!!!!!!!!!!!!!!!!");
+			//System.out.println("!!!!!!!!!!!!!!!!");
 			// se profundidade local for menor que a profundidade global(nao precisa criar
 			// um novo diretorio)
 			bucket.seek(bucket.getFilePointer() - 8);
@@ -118,36 +118,36 @@ public class Hash {
 			int pAntigo = (int) Math.pow(2, (profundidade - 1));
 			// PROBLEMA AQUI!
 			//dir.seek(dir.length() - 4);
-			System.out.println("hash = " + hash);
+			//System.out.println("hash = " + hash);
 			int lastB = getLastBucket();
-			System.out.println("lastB = " + lastB);
+			//System.out.println("lastB = " + lastB);
 			int newLastB = lastB + 8 + (9 * bucketSize);
 			int maiorDir = (int)dir.length() - 4;
-			System.out.println("pr = " + p);
-			System.out.println("maiorDir = " + maiorDir);
+			//System.out.println("pr = " + p);
+			//System.out.println("maiorDir = " + maiorDir);
 			int dirAtual = 4 + 4 * hash;
 			int dirNovo = dirAtual + pAntigo * 4;
-			System.out.println("dir atual = " + dirAtual); //PROBLEMA POR AQUI!!!
+			//System.out.println("dir atual = " + dirAtual); //PROBLEMA POR AQUI!!!
 			dir.seek(dirNovo); // ir para ponteiro que vai apontar para o novo bucket(!!!)
-			System.out.println("dir novo = " + dirNovo);
+			//System.out.println("dir novo = " + dirNovo);
 			// long bL = bucket.length();
 			// System.out.println("bl = " + bL);
 			// System.out.println("bl(int = " + (int)bL);
-			System.out.println("newLastB = " + newLastB);
-			System.out.println("p = " + bucketAdress);
-			System.out.println("dirp = " + dir.getFilePointer());
+			//System.out.println("newLastB = " + newLastB);
+			//System.out.println("p = " + bucketAdress);
+			//System.out.println("dirp = " + dir.getFilePointer());
 			dir.writeInt(newLastB); // tava bucket.length aqui antes, errado pq o ultimo bucket pode nao estar cheio
 			dir.getFD().sync();
 			dir.seek(dir.getFilePointer() - 4);
 			int wtf = dir.readInt();
-			System.out.println("wtf??? = " + wtf);
+			//System.out.println("wtf??? = " + wtf);
 			bucket.seek(newLastB);
 			bucket.writeInt(pBucket);
 			bucket.writeInt(0);
-			System.out.println("tchauuu");
+			//System.out.println("tchauuu");
 			redistribuir(bucketPos);
 			inserir(id, false, pos); //AQUI TA FICANDO INFINITO!!!
-			System.out.println("oieeee");
+			//System.out.println("oieeee");
 		}
 	}
 	public int getLastBucket () throws Exception{
@@ -160,7 +160,7 @@ public class Hash {
 		        maior = b;
 		    }
 		}
-		System.out.println("m = " + maior);
+		//System.out.println("m = " + maior);
 		return maior;
 	}
 
@@ -178,7 +178,7 @@ public class Hash {
 		dir.seek(4 + 4 * p); // pula para onde começa a ter os novos ponteiros (dir.length talvez tb funcione?)
 		int j = 0;
 		for (int i = p; i < pNovo; i++) { // escreve os novos ponteiros
-			System.out.println(dir.getFilePointer());
+			//System.out.println(dir.getFilePointer());
 			dir.writeInt(ponteiros[j]);
 			j++;
 		}
@@ -241,10 +241,10 @@ public class Hash {
 		//System.out.println("t = " + tamanho);
 		for (int i = 0; i < tamanho; i++) {
 			int bucketId = bucket.readInt();
-//			System.out.println("bi = " + bucketId);
+			//System.out.println("bi = " + bucketId);
 			boolean lapide = bucket.readBoolean();
 			int pos = bucket.readInt();
-//			System.out.println("posbucket = " + pos);
+			//System.out.println("posbucket = " + pos);
 			if (bucketId == id && lapide == false) {
 				if (remover){ //se for remover o registr
 					bucket.seek(bucket.getFilePointer() - 5);
