@@ -42,9 +42,9 @@ public class Movie {
 		this.title = "";
 		this.director = "";
 		this.certificate = "";
-		this.genre = null;
+		this.genre = "a,b".split(",");
 		this.rating = 0F;
-		this.year = null;
+		this.year = parseDate(2005);
 	}
 
 	@Override
@@ -61,7 +61,6 @@ public class Movie {
 
 		dos.writeBoolean(lapide);
 		dos.writeInt(id);
-		// dos.writeInt(title.length());
 		dos.writeUTF(title);
 		dos.writeUTF(director);
 		dos.writeBytes(String.format("%-9s", certificate)); // escreve a string com tamanho fixo de 5 caracteres
@@ -74,12 +73,7 @@ public class Movie {
 		dos.writeUTF(stringzona);
 		stringzona = stringzona.substring(0, stringzona.length() - 1);
 		dos.writeFloat(rating);
-		/*if(id == 0) {
-			System.out.println(year);
-		}*/
 		dos.writeLong(year.getTime());
-		
-
 		return baos.toByteArray();
 	}
 
@@ -90,20 +84,17 @@ public class Movie {
 
 		lapide = dis.readBoolean();
 		id = dis.readInt();
-		//System.out.println("id = " + id);
+		// System.out.println("id = " + id);
 		title = dis.readUTF();
 		director = dis.readUTF();
 		byte[] stringBytes = new byte[9];
 		dis.readFully(stringBytes);
 		certificate = new String(stringBytes);
-		int quantGen = dis.readInt();
+		dis.readInt();
 		String allGen = dis.readUTF();
 		genre = allGen.split(",");
 		rating = dis.readFloat();
-		//System.out.println("r = " + rating);
 		year = new Date(dis.readLong());
-		//year = new Date();
-		//System.out.println(year);
 
 	}
 }

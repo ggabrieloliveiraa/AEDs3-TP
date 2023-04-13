@@ -1,24 +1,35 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.RandomAccessFile;
 import java.util.*;
 
 public class CRUD {
 	private RandomAccessFile file;
+	Hash hash;
+	boolean isHash;
 
-	public CRUD(String nomeArquivo) throws IOException {
+	public CRUD(String nomeArquivo, int tipo) throws Exception {
 		String tmp = "../data/" + nomeArquivo;
 		this.file = new RandomAccessFile(tmp, "rw");
+		if (tipo == 1)
+		{
+			isHash = true;
+			this.hash = new Hash(false);
+		} else {
+			isHash = false;
+		}
 	}
 
-	public void fechar() throws IOException {
+	public void fechar() throws Exception {
 		file.close();
 	}
 
-	public int getMaxId() throws IOException {
+	public int getMaxId() throws Exception {
 		file.seek(0);
 		return (file.readInt());
 	}
 
-	public void inserir(byte[] ba) throws IOException {
+	public void inserir(byte[] ba, boolean update) throws Exception {
 		// variaveis que vao ser usadas para posicionar e id
 		int posicao = 4;
 		int tmp = 0;
@@ -38,14 +49,22 @@ public class CRUD {
 
 			if (lapide == true && tamanho >= ba.length) {
 
-				j_temp.id = tmp;
+				if (!update){					
+					int idMaximo = getMaxId() + 1;
+					file.seek(0);	
+					file.writeInt(idMaximo);
+					j_temp.id = getMaxId();
+				}
+				if (isHash){
+					hash.inserir(j_temp.id, false, posicao); //inserir no arquivo de indice hash
+				}
 
 				file.seek(posicao + 4); // pular o tamanho
 
 				byte[] arr = j_temp.toByteArray();
 				file.write(arr);
 
-				System.out.println("filme adicionado na posicao: " + j_temp.id);
+				System.out.println("id do filme inserido: " + j_temp.id);
 				return;
 			}
 
@@ -54,33 +73,50 @@ public class CRUD {
 			tmp++;
 		}
 
-		j_temp.id = getMaxId() + 1;
+		if (!update){	
+			int idMaximo = getMaxId() + 1;
+			file.seek(0);
+			file.writeInt(idMaximo);
+			j_temp.id = getMaxId();
+			
+		}
+
+		if (isHash){
+			hash.inserir(j_temp.id, false, posicao); //inserir no arquivo de indice hash
+		}
 
 		file.seek(posicao);
 		file.writeInt(ba.length);// escrever o tamanho
 
 		byte[] arr = j_temp.toByteArray();
 		file.write(arr);
-		file.seek(0);
-		file.writeInt(tmp);
+		
 
-		System.out.println("filme adicionado na posicao: " + j_temp.id);
+		System.out.println("id do filme inserido: " + j_temp.id);
 		return;
 
 	}
 
-	public Movie buscar(int id) throws IOException {
-		int posicao = apontar(id);
+	public Movie buscar(int id) throws Exception {
+		int posicao;
+		if (isHash){
+			posicao = hash.buscar(id, false); //buscar no arquivo de indice hash
+		}else{
+			posicao = apontar(id);
+		}
 		int tamanho;
+
+		System.out.println(posicao);
 
 		byte ba[];
 		Movie j_temp = new Movie();
 
 		if (posicao != -1) {
+			
+			file.seek(posicao);
 			tamanho = file.readInt();
 			ba = new byte[tamanho];
-			file.seek(posicao + 4);
-			System.out.println("posicao = " + file.getFilePointer());
+			//System.out.println("posicao = " + file.getFilePointer());
 			file.read(ba);
 			j_temp.fromByteArray(ba);
 			return j_temp;
@@ -88,7 +124,7 @@ public class CRUD {
 		return null;
 	}
 
-	public Movie buscar(String title) throws IOException {
+	public Movie buscar(String title) throws Exception {
 		int posicao = apontar(title);
 		int tamanho;
 
@@ -105,15 +141,31 @@ public class CRUD {
 		}
 		return null;
 	}
+	public Movie getFromPos (int pos) throws Exception{
+		file.seek(pos);
+		int tamanho = file.readInt();
+		byte[] ba = new byte[tamanho];
+		file.read(ba);
+		Movie j_temp = new Movie();
+		j_temp.fromByteArray(ba);
+		return j_temp;
+	}
 
-	public void atualizar(int id) throws IOException {
+	public void atualizar(int id) throws Exception {
 		Scanner sc = new Scanner(System.in);
-		int posicao = apontar(id);
+		Movie j_temp = new Movie();
+		int posicao;
+		if (isHash){
+			posicao = hash.buscar(id, false); //apontar no arquivo de indice hash
+			//System.out.println(posicao);		
+		}else{
+			posicao = apontar(id);
+		}
+
+		j_temp = getFromPos(posicao);
 		String tmp = "";
 
 		// Percorre o arquivo em busca do movie com o ID especificado
-		Movie j_temp = new Movie();
-		j_temp = buscar(id);
 
 		System.out.println("qual atributo do filme voce deseja atualizar?");
 
@@ -214,8 +266,14 @@ public class CRUD {
 				break;
 
 			case 0:
+				this.isHash = false;
+				//System.out.println("t arquivo = " + file.length());
 				remover(id);
-				inserir(j_temp.toByteArray());
+				inserir(j_temp.toByteArray(), true);
+				this.isHash = true;
+				int newPos = (apontar(id));
+				//System.out.println("newpos = " + newPos);
+				hash.atualizar(id, newPos);
 				System.out.println("Saindo...");
 				return;
 			default:
@@ -225,9 +283,16 @@ public class CRUD {
 
 	}
 
-	public Movie remover(int id) throws IOException {
+
+	public Movie remover(int id) throws Exception {
 		// Percorre o arquivo em busca do movie com o ID especificado
-		int posicao = apontar(id);
+		int posicao;
+		if (isHash){
+			posicao = hash.buscar(id, true); //remover no arquivo de indice hash
+		}else{
+			posicao = apontar(id);
+		}
+
 		Movie j_temp = new Movie();
 		if (posicao != -1) {
 			byte ba[];
@@ -256,7 +321,7 @@ public class CRUD {
 	 * 
 	 * @return int - false = -1 true = posicao
 	 */
-	public int apontar(int id) throws IOException {
+	public int apontar(int id) throws Exception {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 4;
 		while (posicao < file.length()) {
@@ -273,7 +338,7 @@ public class CRUD {
 		return -1;
 	}
 
-	public int apontar(String title) throws IOException {
+	public int apontar(String title) throws Exception {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao = 4;
 		String registroTitle = "";
@@ -317,15 +382,14 @@ public class CRUD {
 				id++;
 				filmes.add(filme);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return filmes;
 	}
 
 	public void cargaInicial() {
-		List<Movie> filmes = readCsv("../data//movies.csv");
-		
+		List<Movie> filmes = readCsv("../data/movies.csv");
 		byte ba[];
 		try {
 			if (file.length() == 0) {
@@ -335,40 +399,26 @@ public class CRUD {
 				file.seek(4);
 			}
 			try {
-				Hash hash = new Hash(2);
-
+				Hash hash = new Hash(true);
 				for (int i = 0; i < filmes.size(); i++) {
 					ba = filmes.get(i).toByteArray();
 					//System.out.println(filmes.get(i));
-
 					hash.inserir(filmes.get(i).id, false, (int) file.getFilePointer());
-
 					file.writeInt(ba.length); // escreve tamanho da entidade
 
 					file.write(ba); // escreve o byte de arrays da entidade
 				}
-				int pos1 = hash.buscar(0);
-				System.out.println("pos = " + pos1);
 				//file.seek(pos1);
-				
-				Movie j_temp = new Movie();
-				file.seek(hash.buscar(5));
-				int tamanho = file.readInt();
-				ba = new byte[tamanho];
-				file.read(ba);
-				j_temp.fromByteArray(ba);
-				System.out.println(j_temp);
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return;
 	}
 
-	public void mostrarTudoBin() throws IOException {
+	public void mostrarTudoBin() throws Exception {
 		int pos = 0;
 		byte ba[];
 		Movie j_temp = new Movie();
@@ -383,8 +433,8 @@ public class CRUD {
 		}
 	}
 
-	public void mostrarTudo(String filename, int pos) throws IOException {
-		RandomAccessFile arq = new RandomAccessFile("../data/" + filename, "rw");
+	public void mostrarTudo(String filename, int pos) throws Exception {
+		RandomAccessFile arq = new RandomAccessFile("../data/"+filename, "rw");
 		Movie j_temp = new Movie();
 		arq.seek(pos);
 		int tamanho = 0;
@@ -429,7 +479,7 @@ public class CRUD {
 				file.write(ba); // escreve o byte de arrays da entidade
 				// inserir(ba);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return;
@@ -460,7 +510,7 @@ public class CRUD {
 				controle++;
 				filmes.add(filme);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return filmes;

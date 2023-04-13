@@ -1,5 +1,6 @@
 import java.io.RandomAccessFile;
 import java.util.*;
+import java.io.File;
 
 class Registro {
 	public int id;
@@ -20,13 +21,31 @@ public class Hash {
 	private int p;
 	private int bucketSize = 504;
 
-	public Hash(int profundidade) throws Exception {
-		this.dir = new RandomAccessFile("dir.bin", "rw");
-		this.bucket = new RandomAccessFile("bucket.bin", "rw");
-		this.profundidade = profundidade;
+	public Hash(boolean isCargaInicial) throws Exception {
+		this.dir = new RandomAccessFile("../data/dir.bin", "rw");
+		this.bucket = new RandomAccessFile("../data/bucket.bin", "rw");
+	    File b = new File("../data/bucket.bin");
+	    File d = new File ("../data/dir.bin");
+	    if (!b.exists()) {//se nao existir o arquivo
+	    	alocarArquivos();
+	    }
+	    else if (isCargaInicial) { //se existir e for carga inicial
+	    	b.delete();
+	    	d.delete();
+			this.dir = new RandomAccessFile("../data/dir.bin", "rw");
+			this.bucket = new RandomAccessFile("../data/bucket.bin", "rw");
+	    	alocarArquivos();
+	    }
+		else{//se existir e nao for carga inicial
+			this.profundidade = dir.readInt();
+			this.p = (int) Math.pow(2, profundidade);
+		}
+	}
+
+
+	public void alocarArquivos () throws Exception {
+		this.profundidade = 2;
 		this.p = (int) Math.pow(2, profundidade);
-		// this.buckets = new ArrayList[p];
-		// this.diretorio = new int[p];
 		dir.writeInt(profundidade); // profundidade do diretorio no cabeçalho do arquivo
 		for (int i = 0; i < p; i++) {
 			int endereco = i * ((bucketSize * 9) + 8);
@@ -42,8 +61,8 @@ public class Hash {
 
 	public void inserir(int id, boolean lapide, int pos) throws Exception {
 		Scanner sc = new Scanner(System.in);
-		// RandomAccessFile bucket = new RandomAccessFile("bucket.bin", "rw");
-		// RandomAccessFile dir = new RandomAccessFile("dir.bin", "rw");
+		// RandomAccessFile bucket = new RandomAccessFile("../data/bucket.bin", "rw");
+		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
 		// System.out.println("PROFUNDIADE = " + profundidade);
 		// System.out.println("this.p = " + this.p);
 		// System.out.println("id = " + id);
@@ -61,8 +80,6 @@ public class Hash {
 		// System.out.println("tb = " + tamanho);
 		if (tamanho < 504) {
 			System.out.println("ba = " + bucketAdress);
-			System.out.println("tamanho = " + tamanho);
-
 			System.out.println(id);
 			bucket.seek(bucket.getFilePointer() + (tamanho * 9));
 			bucket.writeInt(id);
@@ -91,14 +108,12 @@ public class Hash {
 			inserir(id, false, pos);
 		} else {
 			System.out.println("!!!!!!!!!!!!!!!!");
-			//sc.next();
 			// se profundidade local for menor que a profundidade global(nao precisa criar
 			// um novo diretorio)
 			bucket.seek(bucket.getFilePointer() - 8);
 			pBucket++;
 			bucket.writeInt(pBucket); // nova profundidade local
-			bucket.writeInt(0);//zerando o bucket
-
+			bucket.writeInt(0);
 			int bucketPos = (int) bucket.getFilePointer();
 			int pAntigo = (int) Math.pow(2, (profundidade - 1));
 			// PROBLEMA AQUI!
@@ -121,11 +136,8 @@ public class Hash {
 			System.out.println("newLastB = " + newLastB);
 			System.out.println("p = " + bucketAdress);
 			System.out.println("dirp = " + dir.getFilePointer());
-			int posAntiga = dir.readInt();
-			System.out.println("pdir = " + posAntiga);
-			dir.seek(dirNovo);
 			dir.writeInt(newLastB); // tava bucket.length aqui antes, errado pq o ultimo bucket pode nao estar cheio
-			//dir.getFD().sync();
+			dir.getFD().sync();
 			dir.seek(dir.getFilePointer() - 4);
 			int wtf = dir.readInt();
 			System.out.println("wtf??? = " + wtf);
@@ -134,8 +146,6 @@ public class Hash {
 			bucket.writeInt(0);
 			System.out.println("tchauuu");
 			redistribuir(bucketPos);
-			//sc.next();
-
 			inserir(id, false, pos); //AQUI TA FICANDO INFINITO!!!
 			System.out.println("oieeee");
 		}
@@ -155,7 +165,7 @@ public class Hash {
 	}
 
 	public void aumentarDir(int hash) throws Exception {
-		// RandomAccessFile dir = new RandomAccessFile("dir.bin", "rw");
+		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
 		this.profundidade++;
 		dir.seek(0);
 		dir.writeInt(profundidade);
@@ -180,7 +190,7 @@ public class Hash {
 	}
 
 	public void redistribuir(int pos) throws Exception {
-		// RandomAccessFile bucket = new RandomAccessFile("bucket.bin", "rw");
+		// RandomAccessFile bucket = new RandomAccessFile("../data/bucket.bin", "rw");
 		bucket.seek(pos);
 		Registro[] registros = new Registro[bucketSize];
 		for (int i = 0; i < bucketSize; i++) { // salva os registros do bucket antigo que sera redistribuido em um
@@ -220,30 +230,56 @@ public class Hash {
 		*/
 	}
 
-	public int buscar(int id) throws Exception {
-		// RandomAccessFile bucket = new RandomAccessFile("bucket.bin", "rw");
-		// RandomAccessFile dir = new RandomAccessFile("dir.bin", "rw");
+	public int buscar(int id, boolean remover) throws Exception {
+		// RandomAccessFile bucket = new RandomAccessFile("../data/bucket.bin", "rw");
+		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
 		int hash = hash(id);
 		dir.seek(4 + hash * 4);
 		int posBucket = dir.readInt();
 		bucket.seek(posBucket + 4);
 		int tamanho = bucket.readInt();
-		System.out.println("t = " + tamanho);
+		//System.out.println("t = " + tamanho);
 		for (int i = 0; i < tamanho; i++) {
 			int bucketId = bucket.readInt();
-			System.out.println("bi = " + bucketId);
+//			System.out.println("bi = " + bucketId);
 			boolean lapide = bucket.readBoolean();
 			int pos = bucket.readInt();
-			System.out.println("posbucket = " + pos);
+//			System.out.println("posbucket = " + pos);
 			if (bucketId == id && lapide == false) {
+				if (remover){ //se for remover o registr
+					bucket.seek(bucket.getFilePointer() - 5);
+					bucket.writeBoolean(true);
+				}
 				return pos;
 			}
 		}
 		return -1;
 	}
 
+	//atualizar posica no arquivo de bucket
+	public void atualizar (int id, int pos) throws Exception {
+		int hash = hash(id);
+		dir.seek(4 + hash * 4);
+		int posBucket = dir.readInt();
+		bucket.seek(posBucket + 4);
+		int tamanho = bucket.readInt();
+
+		for (int i = 0; i < tamanho; i++) {
+			int bucketId = bucket.readInt();
+			boolean lapide = bucket.readBoolean();
+			int posi = bucket.readInt();
+
+			if (bucketId == id) {
+				//System.out.println("posi = " + posi);
+				bucket.seek(bucket.getFilePointer() - 5);
+				bucket.writeBoolean(false);
+				bucket.writeInt(pos);				
+			}
+		}
+	}
+
 	private int hash(int k) throws Exception {
-		// RandomAccessFile dir = new RandomAccessFile("dir.bin", "rw");
+		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
 		dir.seek(0);
 		int profundidade = dir.readInt();
 		int p = (int) Math.pow(2, profundidade);
