@@ -1,23 +1,48 @@
 import java.io.IOException;
-
 import java.util.Scanner;
+
 
 public class Main {
 
 	public static void main(String[] args) {
-		interfac();
-		try {
-			OrdenacaoExterna.externalSort("../data/arquivo", 2517, 2);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		init();
 	}
 
-	public static void interfac() {
+	public static void init (){
+		Scanner scanner = new Scanner(System.in);
+		while (true) {
+			System.out.println("Selecione uma operação:");
+			System.out.println("1 - Sequencial + Ordenação externa");
+			System.out.println("2 - Hash");
+			System.out.println("0 - Sair");
+
+			int opcao = scanner.nextInt();
+			scanner.nextLine(); // limpa o buffer do scanner
+			switch (opcao) {
+
+			// listar
+			case 1: 
+				interfac(0);
+				break;
+			case 2:
+				interfac(1);
+				break;
+			case 0:
+				System.out.println("Saindo...");
+				return;
+			default:
+				System.out.println("Opção inválida!");
+			}
+
+		}
+
+	}
+
+	public static void interfac(int tipo) {
 		Scanner scanner = new Scanner(System.in);
 		
 		try {
-			CRUD crud = new CRUD("../data/arquivo.bin");
+			CRUD crud = new CRUD("../data/arquivo.bin", tipo);
 
 			while (true) {
 				System.out.println("Selecione uma operação:");
@@ -29,8 +54,9 @@ public class Main {
 				System.out.println("6 - Carga inicial");
 				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("8 - Ordenação externa");
+				//System.out.println("9 - Gerar lista invertida(gêneros)");
 				System.out.println("0 - Sair");
-				
+		
 				int id = 0;
 				Movie m_temp = new Movie();
 				int opcao = scanner.nextInt();
@@ -40,7 +66,10 @@ public class Main {
 				// listar
 				case 1:
 					System.out.println("1 - Buscar por ID");
-					System.out.println("2 - Buscar por título");
+					if (tipo == 0){
+						System.out.println("2 - Buscar por título");
+					}
+					System.out.println("3 - Buscar por gênero");
 
 					int opco = scanner.nextInt();
 					scanner.nextLine(); // limpa o buffer do scanner
@@ -55,6 +84,11 @@ public class Main {
 						System.out.println("Qual título você deseja mostrar?");
 						String title = scanner.nextLine();
 						m_temp = crud.buscar(title);
+						break;
+					case 3:
+						System.out.println("Você quer pesquisar por quais gêneros?(usa lista invertida)");
+						String query = scanner.nextLine();
+						crud.buscarPorListaInvertida(query);
 						break;
 					default:
 						System.out.println("ERRO: opcao invalida");
@@ -71,7 +105,7 @@ public class Main {
 				case 2:
 					m_temp = getMovie();
 
-					crud.inserir(m_temp.toByteArray());
+					crud.inserir(m_temp.toByteArray(), false);
 					break;
 
 				// atualizar
@@ -88,7 +122,7 @@ public class Main {
 					m_temp = crud.remover(id);
 					break;
 				case 5:
-					crud.mostrarTudo("arquivo.bin", 4);
+					crud.mostrarTudo("../data/arquivo.bin", 4);
 					break;
 				case 6:
 					crud.cargaInicial();
@@ -102,12 +136,12 @@ public class Main {
 					break;
 				case 8:
 					try {
-						OrdenacaoExterna.externalSort("../data/arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
+						OrdenacaoExterna.externalSort("arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
 						System.out.println("ARQUIVO ORDENADO!");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					interfac();
+					interfac(tipo);
 					return;
 				case 0:
 					System.out.println("Saindo...");
@@ -117,7 +151,7 @@ public class Main {
 					System.out.println("Opção inválida!");
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

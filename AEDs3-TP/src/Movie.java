@@ -61,7 +61,6 @@ public class Movie {
 
 		dos.writeBoolean(lapide);
 		dos.writeInt(id);
-		// dos.writeInt(title.length());
 		dos.writeUTF(title);
 		dos.writeUTF(director);
 		dos.writeBytes(String.format("%-9s", certificate)); // escreve a string com tamanho fixo de 5 caracteres

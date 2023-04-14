@@ -30,7 +30,7 @@ public class OrdenacaoExterna {
 		return f;
 	}
 
-	public static void externalSort(String filename, int m, int n) throws IOException {
+	public static void externalSort(String filename, int m, int n) throws Exception {
 		String[] arqs = new String[n];
 		byte ba[];
 		int[] pos = new int[n];
@@ -52,7 +52,7 @@ public class OrdenacaoExterna {
 				filmes[i] = new Movie();
 			}
 			for (int i = 0; i < m; i++) {
-				if (input.getFilePointer() < input.length()-1) {
+				if (input.getFilePointer() < input.length() - 1) {
 					tamanhos[i] = input.readInt();
 					ba = new byte[tamanhos[i]];
 					input.read(ba);
@@ -65,16 +65,14 @@ public class OrdenacaoExterna {
 			pos[controle % n] = distribuir(tamanhos, filmes, filename, (controle % n) + 1, pos[controle % n]);
 			controle++;
 		}
-		CRUD crud = new CRUD("../data/arquivo.bin");
+		CRUD crud = new CRUD("../data/arquivo.bin", 0);
 		// crud.mostrarTudo("../data/arquivo2tmp.bin", 0);
 		intercalacaoBalanceada(arqs, m);
-		crud.mostrarTudo("arquivo3tmp.bin", 0);
-		//crud.mostrarTudo("arquivo4tmp.bin", 0);
 		input.close();
 	}
 
-	private static int calcularPassadas(int m, int n) throws IOException {
-		CRUD crud = new CRUD("../data/arquivo.bin");
+	private static int calcularPassadas(int m, int n) throws Exception {
+		CRUD crud = new CRUD("../data/arquivo.bin", 0);
 		double maxId = crud.getMaxId();
 		crud.fechar();
 		int passadas = (int) (1 + Math.ceil((Math.log((maxId / (double) m))) / Math.log((double) n)));
@@ -82,8 +80,8 @@ public class OrdenacaoExterna {
 
 	}
 
-	private static void intercalacaoBalanceada(String[] inputFiles, int m) throws IOException {
-		CRUD crud = new CRUD("../data/arquivo.bin");
+	private static void intercalacaoBalanceada(String[] inputFiles, int m) throws Exception {
+		CRUD crud = new CRUD("../data/arquivo.bin", 0);
 		int maxId = crud.getMaxId();
 		int n = inputFiles.length;
 		String filename = "../data/arquivo"; 
