@@ -7,16 +7,16 @@ import java.io.File;
 public class CRUD {
 	private RandomAccessFile file;
 	Hash hash;
+	ListaInvertida listaInvertida;
 	boolean isHash;
 
 	public CRUD(String nomeArquivo, int tipo) throws Exception {
-		String tmp = "../data/" + nomeArquivo;
+		String tmp = nomeArquivo;
 		this.file = new RandomAccessFile(tmp, "rw");
-		if (tipo == 1)
-		{
+		if (tipo == 1) {
 			isHash = true;
-			if (file.length() == 0){
-				cargaInicial();	
+			if (file.length() == 0) {
+				cargaInicial();
 				this.hash = new Hash(false);
 				System.out.println("CARGA INICIAL REALIZADA PARA CRIAR ARQUIVOS HASH");
 			} else {
@@ -24,6 +24,9 @@ public class CRUD {
 			}
 		} else {
 			isHash = false;
+		}
+		if (tipo == 1) {
+			this.listaInvertida = new ListaInvertida();
 		}
 	}
 
@@ -34,6 +37,120 @@ public class CRUD {
 	public int getMaxId() throws Exception {
 		file.seek(0);
 		return (file.readInt());
+	}
+
+	String getGeneros() throws Exception {
+		file.readBoolean(); // lapide
+		int id = file.readInt(); // id
+		//System.out.println(id);
+		file.readUTF(); // title
+		file.readUTF(); // director
+		// file.seek(file.getFilePointer() + 9); // certificado(string tamanho fixo)
+		byte[] stringBytes = new byte[9];
+		file.readFully(stringBytes);
+		file.readInt();
+		String allGen = file.readUTF();
+		return allGen;
+	}
+
+	public ArrayList<String> lerGeneros() throws Exception { // cria uma lista sem repetir com todos os generos que tem
+		int posicao = 4;
+		int tamanho = 0;
+		ArrayList<String> listaGen = new ArrayList<>();
+
+		while (posicao < file.length()) { // sempre da problema na ultima iteração por algum motivo
+
+			file.seek(posicao);
+			tamanho = file.readInt();
+			String allGen = getGeneros();
+			// System.out.println("ag = " + allGen);
+			String[] gen = allGen.split(",");
+			for (int i = 1; i < gen.length; i++) {
+				gen[i] = gen[i].substring(1); // tirar o espaço antes do gen dps do primeiro(passar isso pro movie dps)
+				//System.out.println("gi = " + gen[i]);
+			}
+			for (int i = 0; i < gen.length; i++) {
+				if (!listaGen.contains(gen[i])) {
+					System.out.println("CRUD // " + gen[i]);
+					listaGen.add(gen[i]);
+				}
+			}
+			posicao += tamanho + 4;
+		}
+		for (int i = 0; i < listaGen.size(); i++) {
+			// System.out.println(listaGen.get(i));
+		}
+		return listaGen;
+
+	}
+
+	public ArrayList<PalavraIndexada> getPalavrasIndexadas() throws Exception {
+		int posicao = 4;
+		int tamanho = 0;
+		ArrayList<String> dicionario = lerGeneros();
+		ArrayList<PalavraIndexada> pi = new ArrayList<PalavraIndexada>();
+		for (int i = 0; i < dicionario.size(); i++) {
+			pi.add(new PalavraIndexada(dicionario.get(i))); // adiciona as palavras do dicionario
+		}
+		while (posicao < file.length()) {
+			file.seek(posicao);
+			//System.out.println("p = " + posicao);
+			tamanho = file.readInt();
+			//System.out.println("t = " + tamanho);
+			//System.out.println("fl = " + file.length());
+			file.readBoolean(); // lapide
+			int id = file.readInt(); // id
+			file.readUTF(); // title
+			file.readUTF(); // director
+			file.seek(file.getFilePointer() + 9); // certificado(string tamanho fixo)
+			int quantGen = file.readInt();
+			String allGen = file.readUTF();
+			String[] gen = allGen.split(",");
+			for (int i = 1; i < quantGen; i++) {
+				gen[i] = gen[i].substring(1); // tirar o espaço antes do gen dps do primeiro(passar isso pro movie dps)
+			}
+			for (int i = 0; i < quantGen; i++) {
+				for (int j = 0; j < pi.size(); j++) {
+					if (pi.get(j).palavra.equals(gen[i])) { // quando a palavra for igual a do dicionario, adicionar id
+						pi.get(j).addId(id);
+					}
+				}
+			}
+			posicao += tamanho + 4;
+		}
+		return pi;
+	}
+
+	public void buscarPorListaInvertida(String query) throws Exception {
+		ArrayList<Integer> ids = listaInvertida.buscar(query);
+		buscarPorIds(ids);
+	}
+
+	public void buscarPorIds(ArrayList<Integer> ids) throws Exception {
+		int posicao = 4;
+		int tamanho = 0;
+		byte ba[];
+		for (int i = 0; i < ids.size(); i++){
+			//System.out.println("id = " + ids.get(i));
+		}
+		List<Movie> movies = new ArrayList<Movie>();
+		for (int i = 0; i < ids.size(); i++) {
+			posicao = hash.buscar(ids.get(i), false);
+			if (posicao != -1) {
+				System.out.println("pos = " + posicao);
+				file.seek(posicao);
+				tamanho = file.readInt();
+				ba = new byte[tamanho];
+				// System.out.println("posicao = " + file.getFilePointer());
+				file.read(ba);
+				Movie j_temp = new Movie();
+				j_temp.fromByteArray(ba);
+				movies.add(j_temp);
+			}
+		}
+		for (int i = 0; i < movies.size(); i++) {
+			System.out.println(movies.get(i));
+		}
 	}
 
 	public void inserir(byte[] ba, boolean update) throws Exception {
@@ -56,14 +173,14 @@ public class CRUD {
 
 			if (lapide == true && tamanho >= ba.length) {
 
-				if (!update){					
+				if (!update) {
 					int idMaximo = getMaxId() + 1;
-					file.seek(0);	
+					file.seek(0);
 					file.writeInt(idMaximo);
 					j_temp.id = getMaxId();
 				}
-				if (isHash){
-					hash.inserir(j_temp.id, false, posicao); //inserir no arquivo de indice hash
+				if (isHash) {
+					hash.inserir(j_temp.id, false, posicao); // inserir no arquivo de indice hash
 				}
 
 				file.seek(posicao + 4); // pular o tamanho
@@ -80,16 +197,16 @@ public class CRUD {
 			tmp++;
 		}
 
-		if (!update){	
+		if (!update) {
 			int idMaximo = getMaxId() + 1;
 			file.seek(0);
 			file.writeInt(idMaximo);
 			j_temp.id = getMaxId();
-			
+
 		}
 
-		if (isHash){
-			hash.inserir(j_temp.id, false, posicao); //inserir no arquivo de indice hash
+		if (isHash) {
+			hash.inserir(j_temp.id, false, posicao); // inserir no arquivo de indice hash
 		}
 
 		file.seek(posicao);
@@ -97,7 +214,6 @@ public class CRUD {
 
 		byte[] arr = j_temp.toByteArray();
 		file.write(arr);
-		
 
 		System.out.println("id do filme inserido: " + j_temp.id);
 		return;
@@ -106,24 +222,24 @@ public class CRUD {
 
 	public Movie buscar(int id) throws Exception {
 		int posicao;
-		if (isHash){
-			posicao = hash.buscar(id, false); //buscar no arquivo de indice hash
-		}else{
+		if (isHash) {
+			posicao = hash.buscar(id, false); // buscar no arquivo de indice hash
+		} else {
 			posicao = apontar(id);
 		}
 		int tamanho;
 
-		//System.out.println(posicao);
+		// System.out.println(posicao);
 
 		byte ba[];
 		Movie j_temp = new Movie();
 
 		if (posicao != -1) {
-			
+
 			file.seek(posicao);
 			tamanho = file.readInt();
 			ba = new byte[tamanho];
-			//System.out.println("posicao = " + file.getFilePointer());
+			// System.out.println("posicao = " + file.getFilePointer());
 			file.read(ba);
 			j_temp.fromByteArray(ba);
 			return j_temp;
@@ -148,7 +264,8 @@ public class CRUD {
 		}
 		return null;
 	}
-	public Movie getFromPos (int pos) throws Exception{
+
+	public Movie getFromPos(int pos) throws Exception {
 		file.seek(pos);
 		int tamanho = file.readInt();
 		byte[] ba = new byte[tamanho];
@@ -162,10 +279,10 @@ public class CRUD {
 		Scanner sc = new Scanner(System.in);
 		Movie j_temp = new Movie();
 		int posicao;
-		if (isHash){
-			posicao = hash.buscar(id, false); //apontar no arquivo de indice hash
-			//System.out.println(posicao);		
-		}else{
+		if (isHash) {
+			posicao = hash.buscar(id, false); // apontar no arquivo de indice hash
+			// System.out.println(posicao);
+		} else {
 			posicao = apontar(id);
 		}
 
@@ -274,12 +391,12 @@ public class CRUD {
 
 			case 0:
 				this.isHash = false;
-				//System.out.println("t arquivo = " + file.length());
+				// System.out.println("t arquivo = " + file.length());
 				remover(id);
 				inserir(j_temp.toByteArray(), true);
 				this.isHash = true;
 				int newPos = (apontar(id));
-				//System.out.println("newpos = " + newPos);
+				// System.out.println("newpos = " + newPos);
 				hash.atualizar(id, newPos);
 				System.out.println("Saindo...");
 				return;
@@ -290,13 +407,12 @@ public class CRUD {
 
 	}
 
-
 	public Movie remover(int id) throws Exception {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao;
-		if (isHash){
-			posicao = hash.buscar(id, true); //remover no arquivo de indice hash
-		}else{
+		if (isHash) {
+			posicao = hash.buscar(id, true); // remover no arquivo de indice hash
+		} else {
 			posicao = apontar(id);
 		}
 
@@ -409,13 +525,13 @@ public class CRUD {
 				Hash hash = new Hash(true);
 				for (int i = 0; i < filmes.size(); i++) {
 					ba = filmes.get(i).toByteArray();
-					//System.out.println(filmes.get(i));
+					// System.out.println(filmes.get(i));
 					hash.inserir(filmes.get(i).id, false, (int) file.getFilePointer());
 					file.writeInt(ba.length); // escreve tamanho da entidade
 
 					file.write(ba); // escreve o byte de arrays da entidade
 				}
-				//file.seek(pos1);
+				// file.seek(pos1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -441,7 +557,7 @@ public class CRUD {
 	}
 
 	public void mostrarTudo(String filename, int pos) throws Exception {
-		RandomAccessFile arq = new RandomAccessFile("../data/"+filename, "rw");
+		RandomAccessFile arq = new RandomAccessFile(filename, "rw");
 		Movie j_temp = new Movie();
 		arq.seek(pos);
 		int tamanho = 0;
@@ -469,7 +585,7 @@ public class CRUD {
 
 	public void cargaInicialRandom() {
 		int[] id = aleatorizar(10064);
-		List<Movie> filmes = readCsv("../data/movies.csv", id);
+		List<Movie> filmes = readCsv("movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {

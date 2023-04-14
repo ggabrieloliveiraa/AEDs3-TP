@@ -54,6 +54,7 @@ public class Main {
 				System.out.println("6 - Carga inicial");
 				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("8 - Ordenação externa");
+				//System.out.println("9 - Gerar lista invertida(gêneros)");
 				System.out.println("0 - Sair");
 		
 				int id = 0;
@@ -68,6 +69,7 @@ public class Main {
 					if (tipo == 0){
 						System.out.println("2 - Buscar por título");
 					}
+					System.out.println("3 - Buscar por gênero");
 
 					int opco = scanner.nextInt();
 					scanner.nextLine(); // limpa o buffer do scanner
@@ -82,6 +84,11 @@ public class Main {
 						System.out.println("Qual título você deseja mostrar?");
 						String title = scanner.nextLine();
 						m_temp = crud.buscar(title);
+						break;
+					case 3:
+						System.out.println("Você quer pesquisar por quais gêneros?(usa lista invertida)");
+						String query = scanner.nextLine();
+						crud.buscarPorListaInvertida(query);
 						break;
 					default:
 						System.out.println("ERRO: opcao invalida");
@@ -115,7 +122,7 @@ public class Main {
 					m_temp = crud.remover(id);
 					break;
 				case 5:
-					crud.mostrarTudo("arquivo.bin", 4);
+					crud.mostrarTudo("../data/arquivo.bin", 4);
 					break;
 				case 6:
 					crud.cargaInicial();
@@ -129,7 +136,7 @@ public class Main {
 					break;
 				case 8:
 					try {
-						OrdenacaoExterna.externalSort("../data/arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
+						OrdenacaoExterna.externalSort("arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
 						System.out.println("ARQUIVO ORDENADO!");
 					} catch (IOException e) {
 						e.printStackTrace();
