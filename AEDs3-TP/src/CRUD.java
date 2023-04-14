@@ -178,9 +178,11 @@ public class CRUD {
 					file.seek(0);
 					file.writeInt(idMaximo);
 					j_temp.id = getMaxId();
+
 				}
 				if (isHash) {
 					hash.inserir(j_temp.id, false, posicao); // inserir no arquivo de indice hash
+					
 				}
 
 				file.seek(posicao + 4); // pular o tamanho

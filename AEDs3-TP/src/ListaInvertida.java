@@ -140,6 +140,60 @@ public class ListaInvertida {
 		return entry;
 	}
 
+	public int apontar (String palavra, int id) throws Exception {
+		palavras.seek(0);
+		int tam = palavras.readInt();
+		int pos = -1;
+		String tmp;
+		for (int i = 0; i < tam; i++){
+			tmp = palavras.readUTF();
+			pos = palavras.readInt();
+			if (tmp.equals(palavra)){
+				i = tam;
+			}
+		}
+		indices.seek(pos);
+		int frequencia = indices.readInt();
+
+		int iteracoes = (int)(((frequencia) / ((tamInd - 4)/4))+1);//calculo de quantos buckets vao existir
+
+		for (int j = 0; j < iteracoes; j++){
+			if (j != iteracoes - 1){ //se estiver nos primeiros buckets
+				for (int k = 0; k < (tamInd-4)/4; k++) {
+					int idi = indices.readInt();
+					if (idi == id){
+						return ((int)(indices.getFilePointer() - 4));
+					}
+				}
+			} else {// se estiver no ultimo 'bucket'
+				for (int k = 0; k < frequencia - ((tamInd/4)*(j)); k++) {
+					System.out.println("else");
+						int idi = indices.readInt();
+						if (idi == id){
+							return ((int)(indices.getFilePointer() - 4));
+						}
+				}
+			}
+		}
+		
+		return (-1);
+
+	}
+
+	public boolean remover (String palavra, int id) throws Exception {
+		int posRemov = apontar (palavra, id);
+		if (posRemov != -1){
+			indices.seek(posRemov);
+			indices.writeInt(-1);
+			System.out.println("ITEM REMOVIDO!");
+			return (true);
+		} else {
+			System.out.println("ERRO: ITEM NÃO ENCONTRADO");
+			return false;
+		}
+
+	}
+
 	public ArrayList<Integer> buscar(String query) throws Exception {
 		String[] words = query.split(" ");
 		palavras.seek(0);
