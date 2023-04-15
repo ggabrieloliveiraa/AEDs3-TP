@@ -30,7 +30,7 @@ public class OrdenacaoExterna {
 		return f;
 	}
 
-	public static void externalSort(String filename, int m, int n) throws IOException {
+	public static void externalSort(String filename, int m, int n) throws Exception {
 		String[] arqs = new String[n];
 		byte ba[];
 		int[] pos = new int[n];
@@ -65,14 +65,14 @@ public class OrdenacaoExterna {
 			pos[controle % n] = distribuir(tamanhos, filmes, filename, (controle % n) + 1, pos[controle % n]);
 			controle++;
 		}
-		CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
-		// crud.mostrarTudo("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo2tmp.bin", 0);
+		CRUD crud = new CRUD("../data/arquivo.bin", 0);
+		// crud.mostrarTudo("../data/arquivo2tmp.bin", 0);
 		intercalacaoBalanceada(arqs, m);
 		input.close();
 	}
 
-	private static int calcularPassadas(int m, int n) throws IOException {
-		CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+	private static int calcularPassadas(int m, int n) throws Exception {
+		CRUD crud = new CRUD("../data/arquivo.bin", 0);
 		double maxId = crud.getMaxId();
 		crud.fechar();
 		int passadas = (int) (1 + Math.ceil((Math.log((maxId / (double) m))) / Math.log((double) n)));
@@ -80,11 +80,11 @@ public class OrdenacaoExterna {
 
 	}
 
-	private static void intercalacaoBalanceada(String[] inputFiles, int m) throws IOException {
-		CRUD crud = new CRUD("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+	private static void intercalacaoBalanceada(String[] inputFiles, int m) throws Exception {
+		CRUD crud = new CRUD("../data/arquivo.bin", 0);
 		int maxId = crud.getMaxId();
 		int n = inputFiles.length;
-		String filename = "/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo";
+		String filename = "../data/arquivo";
 		String[] arqS = new String[n * 2];
 		for (int i = 0; i < n; i++) {
 			arqS[i] = inputFiles[i];
@@ -248,9 +248,9 @@ public class OrdenacaoExterna {
 		
 		RandomAccessFile in = new RandomAccessFile(arquivoFinal, "r");
 		// crud.mostrarTudo(arquivoFinal, 0);
-		File aaaaaaaa = new File("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin");
+		File aaaaaaaa = new File("../data/arquivo.bin");
 		aaaaaaaa.delete();
-		RandomAccessFile out = new RandomAccessFile("/home/gabriel/git/AEDs3-TP/AEDs3-TP/arquivo.bin", "rw");
+		RandomAccessFile out = new RandomAccessFile("../data/arquivo.bin", "rw");
 		out.writeInt(maxId);
 		byte[] buffer = new byte[1024];
 

@@ -76,7 +76,6 @@ public class Movie {
 		dos.writeLong(year.getTime());
 		return baos.toByteArray();
 	}
-	
 
 	public void fromByteArray(byte ba[]) throws IOException {
 
