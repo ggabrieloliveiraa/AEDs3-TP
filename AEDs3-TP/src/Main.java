@@ -210,7 +210,6 @@ public class Main {
 			System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
 			genre[i] = sc.nextLine();
 		}
-
 		System.out.println("Digite a avaliação do filme, separado por vírgula");
 		rating = sc.nextFloat();
 

@@ -225,7 +225,6 @@ public class Hash {
 			bucket.seek(bucketAdress + 4);
 			tamanho++;
 			bucket.writeInt(tamanho);
-
 		}
 		*/
 	}

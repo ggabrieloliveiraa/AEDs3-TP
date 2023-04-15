@@ -189,6 +189,10 @@ public class CRUD {
 
 				byte[] arr = j_temp.toByteArray();
 				file.write(arr);
+				for (int i = 0; i < j_temp.genre.length; i++) {
+					System.out.println("????????");
+					listaInvertida.inserir(j_temp.genre[i], j_temp.id); //inserir generos na lista invertida
+				}
 
 				System.out.println("id do filme inserido: " + j_temp.id);
 				return;
@@ -215,6 +219,10 @@ public class CRUD {
 		file.writeInt(ba.length);// escrever o tamanho
 
 		byte[] arr = j_temp.toByteArray();
+		for (int i = 0; i < j_temp.genre.length; i++) {
+			System.out.println("????????");
+			listaInvertida.inserir(j_temp.genre[i], j_temp.id); //inserir generos na lista invertidaa
+		}
 		file.write(arr);
 
 		System.out.println("id do filme inserido: " + j_temp.id);
@@ -370,6 +378,7 @@ public class CRUD {
 					System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
 					genre[i] = sc.nextLine();
 				}
+				
 
 				// verificar se cabe
 				file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() + j_temp.certificate.length());
@@ -399,6 +408,9 @@ public class CRUD {
 				this.isHash = true;
 				int newPos = (apontar(id));
 				// System.out.println("newpos = " + newPos);
+				for (int i = 0; i < j_temp.genre.length; i++) {
+					listaInvertida.inserir(j_temp.genre[i], j_temp.id); //inserir generos na lista invertida
+				}
 				hash.atualizar(id, newPos);
 				System.out.println("Saindo...");
 				return;
