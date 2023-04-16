@@ -619,7 +619,7 @@ public class CRUD {
 
 	public void cargaInicialRandom() {
 		int[] id = aleatorizar(10064);
-		List<Movie> filmes = readCsv("movies.csv", id);
+		List<Movie> filmes = readCsv("../data/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {
