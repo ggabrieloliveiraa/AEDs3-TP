@@ -85,7 +85,7 @@ public class ListaInvertida {
 		int qtNaLista = indices.readInt();
 		if (qtNaLista == maxRegistros) { // se a ultima lista estiver cheia, cria nova lista
 			indices.seek(indices.getFilePointer() + 4 * qtNaLista); // vai pro final da lista
-			indices.writeInt((int) indices.length()); // escreve ponteiro para nova lista que vai ser criada
+			indices.writeInt((int) indices.length() + 4); // escreve ponteiro para nova lista que vai ser criada
 			indices.seek(indices.length()); // vai pra nova lista
 			indices.writeInt(1); // quantida de itens na lista
 			indices.writeInt(id); // finalmente insere na lista o id
@@ -96,11 +96,7 @@ public class ListaInvertida {
 			indices.writeInt(novaQt); // escreve nova quantidade de ids nessa lista
 			indices.seek(indices.getFilePointer() + qtNaLista * 4); // vai pro final da lista
 			System.out.println("salveeee, id = " + id);
-			indices.writeInt(id); // escreve novo id
-			indices.seek(indices.getFilePointer() - 8);
-			int algumId = indices.readInt();
-			System.out.println("id aleatorio = " + algumId);
-			
+			indices.writeInt(id); // escreve novo id		
 		}
 	}
 
@@ -217,6 +213,7 @@ public class ListaInvertida {
 		System.out.println("tr = " + result.size());
 		for (int i = 0; i < result.size(); i++) {
 			System.out.println("r = " + result.get(i));
+			
 		}
 		for (int i = 1; i < words.length; i++) {
 			ArrayList<Integer> entry = findEntry(words[i]);
