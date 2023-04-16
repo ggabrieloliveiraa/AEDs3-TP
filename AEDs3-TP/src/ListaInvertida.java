@@ -3,33 +3,59 @@ import java.io.RandomAccessFile;
 import java.util.*;
 
 public class ListaInvertida {
+	private int tipo; // tipo 0 = gen; tipo 1 = dir;
 	private RandomAccessFile palavras; // arquivo invertido
 	private RandomAccessFile indices; // lista invertida
 	public static int tamLista = 5000; // 5000 bytes cabem 1248 registros(4 bytes pro tamanho e 4 pro ponteiro pra prox
 										// lista)
-	public static int maxRegistros = (tamLista - 8) / 4;
+	public static int maxRegistros = (tamLista - 8) / 4; // quantos registros cabe em uma lista
 
-	ListaInvertida(boolean isCargaInicial) throws Exception {
-		this.palavras = new RandomAccessFile("palavras.bin", "rw");
-		this.indices = new RandomAccessFile("indices.bin", "rw");
+	ListaInvertida(boolean isCargaInicial, int tipo) throws Exception {
+		this.tipo = tipo;
+		abrirArquivo();
 		if (palavras.length() == 0) {// se nao existir o arquivo listainvertida ainda
 			preencherCringe();
 			System.out.println("Lista invertida criada!");
 		} else if (isCargaInicial) {
-			File p = new File("palavras.bin");
-			File i = new File("indices.bin");
+			deletarArquivo();
+			abrirArquivo();
+		}
+	}
+
+	public void deletarArquivo() throws Exception {
+		if (this.tipo == 0) {
+			File p = new File("palavrasGen.bin");
+			File i = new File("indicesGen.bin");
 			p.delete();
 			i.delete();
-			this.palavras = new RandomAccessFile("palavras.bin", "rw");
-			this.indices = new RandomAccessFile("indices.bin", "rw");
+			abrirArquivo();
+		} else if (this.tipo == 1) {
+			File p = new File("palavrasDir.bin");
+			File i = new File("indicesDir.bin");
+			p.delete();
+			i.delete();
+		}
+	}
+
+	public void abrirArquivo() throws Exception {
+		if (this.tipo == 0) {
+			this.palavras = new RandomAccessFile("palavrasGen.bin", "rw");
+			this.indices = new RandomAccessFile("indicesGen.bin", "rw");
+		} else if (this.tipo == 1) {
+			this.palavras = new RandomAccessFile("palavrasDir.bin", "rw");
+			this.indices = new RandomAccessFile("indicesDir.bin", "rw");
 		}
 	}
 
 	public void preencherCringe() throws Exception {
-		this.palavras = new RandomAccessFile("palavras.bin", "rw");
-		this.indices = new RandomAccessFile("indices.bin", "rw");
+		ArrayList<PalavraIndexada> palavrasIn;
+		abrirArquivo();
 		CRUD crud = new CRUD("arquivo.bin", 0);
-		ArrayList<PalavraIndexada> palavrasIn = crud.getPalavrasIndexadas();
+		if (tipo == 0) {
+			palavrasIn = crud.getPalavrasIndexadas();
+		} else {
+			palavrasIn = crud.getPalavrasIndexadasDir();
+		}
 		palavras.seek(0);
 		palavras.writeInt(palavrasIn.size());
 		for (int i = 0; i < palavrasIn.size(); i++) {
@@ -253,7 +279,10 @@ public class ListaInvertida {
 	public ArrayList<Integer> findEntry(String p) throws Exception {
 		palavras.seek(0);
 		PalavraArq palavra = getPalavra(p);
-		ArrayList<Integer> entry = getIndices(palavra);
+		ArrayList<Integer> entry = new ArrayList<Integer>();
+		if (palavra != null) {
+			entry = getIndices(palavra);
+		}
 		return entry;
 	}
 
