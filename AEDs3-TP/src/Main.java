@@ -119,7 +119,7 @@ public class Main {
 				case 4:
 					System.out.println("Qual ID você deseja remover?");
 					id = scanner.nextInt();
-					m_temp = crud.remover(id);
+					m_temp = crud.remover(id, false);
 					break;
 				case 5:
 					crud.mostrarTudo("arquivo.bin", 4);

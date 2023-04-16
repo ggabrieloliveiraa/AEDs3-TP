@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
 
@@ -8,18 +9,22 @@ public class ListaInvertida {
 										// lista)
 	public static int maxRegistros = (tamLista - 8) / 4;
 
-	ListaInvertida() throws Exception {
-		// se nao existir o arquivo listainvertida ainda
-		preencherCringe();
+	ListaInvertida(boolean isCargaInicial) throws Exception {
+		this.palavras = new RandomAccessFile("palavras.bin", "rw");
+		this.indices = new RandomAccessFile("indices.bin", "rw");
+		if (palavras.length() == 0) {// se nao existir o arquivo listainvertida ainda
+			preencherCringe();
+			System.out.println("Lista invertida criada!");
+		} else if (isCargaInicial) {
+			File p = new File("palavras.bin");
+			File i = new File("indices.bin");
+			p.delete();
+			i.delete();
+			this.palavras = new RandomAccessFile("palavras.bin", "rw");
+			this.indices = new RandomAccessFile("indices.bin", "rw");
+		}
 	}
 
-	/*
-	 * problema que pode ter: quando adicionar mais registros que corresponde a uma
-	 * palavra específica, o tamanho pode aumentar e nao caber mais no arquivo com
-	 * os indices soluções: tamanho fixo mt grande para cada lista invertida
-	 * correspondente a uma palavra ou encadeamento(cada id tera um ponteiro para o
-	 * proximo id)
-	 */
 	public void preencherCringe() throws Exception {
 		this.palavras = new RandomAccessFile("palavras.bin", "rw");
 		this.indices = new RandomAccessFile("indices.bin", "rw");
@@ -31,7 +36,6 @@ public class ListaInvertida {
 			int freq = palavrasIn.get(i).id.size();
 			palavras.writeUTF(palavrasIn.get(i).palavra); // escreve a palavra
 			palavras.writeInt(freq); // escreve a frequencia
-			System.out.println(palavrasIn.get(i).palavra);
 			palavras.writeInt((int) indices.length()); // escreve o ponteiro pros indices
 			indices.seek((int) indices.length());
 			preencherIndices(palavrasIn.get(i).id);
@@ -85,22 +89,22 @@ public class ListaInvertida {
 		int qtNaLista = indices.readInt();
 		if (qtNaLista == maxRegistros) { // se a ultima lista estiver cheia, cria nova lista
 			indices.seek(indices.getFilePointer() + 4 * qtNaLista); // vai pro final da lista
-			indices.writeInt((int) indices.length()); // escreve ponteiro para nova lista que vai ser criada
-			indices.seek(indices.length()); // vai pra nova lista
+			int a = (int) indices.length() % tamLista;
+			int qtFalta = tamLista - a; // quanto falta pra proxima lista
+			if (a == 0) {
+				qtFalta = 0;
+			}
+			indices.writeInt((int) indices.length() + qtFalta); // escreve ponteiro para nova lista que vai ser criada
+			indices.seek(indices.length() + qtFalta); // vai pra nova lista
 			indices.writeInt(1); // quantida de itens na lista
 			indices.writeInt(id); // finalmente insere na lista o id
-			System.out.println("????? uai = " + id);
 		} else { // se a ultima lista ainda tiver espaço
 			int novaQt = qtNaLista + 1;
 			indices.seek(indices.getFilePointer() - 4);
 			indices.writeInt(novaQt); // escreve nova quantidade de ids nessa lista
 			indices.seek(indices.getFilePointer() + qtNaLista * 4); // vai pro final da lista
-			System.out.println("salveeee, id = " + id);
 			indices.writeInt(id); // escreve novo id
 			indices.seek(indices.getFilePointer() - 8);
-			int algumId = indices.readInt();
-			System.out.println("id aleatorio = " + algumId);
-			
 		}
 	}
 
@@ -146,11 +150,19 @@ public class ListaInvertida {
 				PalavraArq pna = readPalavra();
 				if (palavra.equals(pna.palavra)) {
 					inserirIndice(id, pna);
+					palavras.seek(palavras.getFilePointer() - 8);
+					int newFreq = pna.freq + 1;
+					palavras.writeInt(newFreq);
 					return;
 				}
 			}
 		}
-		PalavraArq pna = new PalavraArq(palavra, 1, (int) indices.length());
+		int a = (int) indices.length() % tamLista;
+		int qtFalta = tamLista - a; // quanto falta pra proxima lista
+		if (a == 0) {
+			qtFalta = 0;
+		}
+		PalavraArq pna = new PalavraArq(palavra, 1, (int) indices.length() + qtFalta);
 		escrevePalavra(pna);
 		inserirIndice(id, pna);
 	}
@@ -165,6 +177,38 @@ public class ListaInvertida {
 		return ids;
 	}
 
+	public void removerId(int idProcurado, PalavraArq pna) throws Exception {
+		indices.seek(pna.apontadorIndice);
+		for (int i = 0; i < pna.qtListas; i++) {
+			if (i != pna.qtListas - 1) {
+				int qtNaLista = indices.readInt();
+				for (int j = 0; j < qtNaLista; j++) { // caso ainda nao esteja na ultima lista
+					int id = indices.readInt();
+					if (id == idProcurado) {
+						indices.seek(indices.getFilePointer() - 4);
+						indices.writeInt(-1);
+					}
+				}
+				int nextPos = indices.readInt();
+				indices.seek(nextPos); // vai para a proxima lista encadeada
+			} else { // se ja estiver na ultima lista
+				int qtNaLista = indices.readInt();
+				for (int j = 0; j < qtNaLista; j++) {
+					int id = indices.readInt();
+					if (id == idProcurado) {
+						indices.seek(indices.getFilePointer() - 4);
+						indices.writeInt(-1);
+					}
+				}
+			}
+		}
+	}
+
+	public void remover(String palavra, int id) throws Exception {
+		PalavraArq pna = getPalavra(palavra);
+		removerId(id, pna);
+	}
+
 	public ArrayList<Integer> getIndices(PalavraArq pna) throws Exception {
 		indices.seek(pna.apontadorIndice);
 		ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -173,16 +217,19 @@ public class ListaInvertida {
 				int qtNaLista = indices.readInt();
 				for (int j = 0; j < qtNaLista; j++) { // caso ainda nao esteja na ultima lista
 					int id = indices.readInt();
-					ids.add(id);
+					if (id != -1) {
+						ids.add(id);
+					}
 				}
 				int nextPos = indices.readInt();
 				indices.seek(nextPos); // vai para a proxima lista encadeada
 			} else { // se ja estiver na ultima lista
-				System.out.println("p = " + pna.palavra);
 				int qtNaLista = indices.readInt();
 				for (int j = 0; j < qtNaLista; j++) {
 					int id = indices.readInt();
-					ids.add(id);
+					if (id != -1) {
+						ids.add(id);
+					}
 				}
 			}
 		}
@@ -190,12 +237,13 @@ public class ListaInvertida {
 	}
 
 	public PalavraArq getPalavra(String palavra) throws Exception {
-		//busca a palavra e retorna suas propriedades(com a palavra, frequencia e apontador pro indice)
+		// busca a palavra e retorna suas propriedades(com a palavra, frequencia e
+		// apontador pro indice)
 		palavras.seek(0);
 		int qtPalavras = palavras.readInt();
 		for (int i = 0; i < qtPalavras; i++) {
 			PalavraArq pna = readPalavra();
-			if (palavra.equals(pna.palavra)) {
+			if (palavra.equalsIgnoreCase(pna.palavra)) {
 				return (pna);
 			}
 		}
@@ -214,16 +262,9 @@ public class ListaInvertida {
 		palavras.seek(0);
 		indices.seek(0);
 		ArrayList<Integer> result = findEntry(words[0]); // começa com a lista invertida da primeira palavra
-		System.out.println("tr = " + result.size());
-		for (int i = 0; i < result.size(); i++) {
-			System.out.println("r = " + result.get(i));
-		}
 		for (int i = 1; i < words.length; i++) {
 			ArrayList<Integer> entry = findEntry(words[i]);
 			result.retainAll(entry); // interseção com a lista invertida da próxima palavra
-		}
-		for (int i = 0; i < result.size(); i++) {
-			System.out.println("rd = " + result.get(i));
 		}
 		return result;
 	}

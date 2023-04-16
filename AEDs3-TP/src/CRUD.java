@@ -26,7 +26,7 @@ public class CRUD {
 			isHash = false;
 		}
 		if (tipo == 1) {
-			this.listaInvertida = new ListaInvertida();
+			this.listaInvertida = new ListaInvertida(false);
 		}
 	}
 
@@ -42,7 +42,7 @@ public class CRUD {
 	String getGeneros() throws Exception {
 		file.readBoolean(); // lapide
 		int id = file.readInt(); // id
-		//System.out.println(id);
+		// System.out.println(id);
 		file.readUTF(); // title
 		file.readUTF(); // director
 		// file.seek(file.getFilePointer() + 9); // certificado(string tamanho fixo)
@@ -67,7 +67,7 @@ public class CRUD {
 			String[] gen = allGen.split(",");
 			for (int i = 1; i < gen.length; i++) {
 				gen[i] = gen[i].substring(1); // tirar o espaço antes do gen dps do primeiro(passar isso pro movie dps)
-				//System.out.println("gi = " + gen[i]);
+				// System.out.println("gi = " + gen[i]);
 			}
 			for (int i = 0; i < gen.length; i++) {
 				if (!listaGen.contains(gen[i])) {
@@ -94,10 +94,10 @@ public class CRUD {
 		}
 		while (posicao < file.length()) {
 			file.seek(posicao);
-			//System.out.println("p = " + posicao);
+			// System.out.println("p = " + posicao);
 			tamanho = file.readInt();
-			//System.out.println("t = " + tamanho);
-			//System.out.println("fl = " + file.length());
+			// System.out.println("t = " + tamanho);
+			// System.out.println("fl = " + file.length());
 			file.readBoolean(); // lapide
 			int id = file.readInt(); // id
 			file.readUTF(); // title
@@ -130,14 +130,14 @@ public class CRUD {
 		int posicao = 4;
 		int tamanho = 0;
 		byte ba[];
-		for (int i = 0; i < ids.size(); i++){
-			//System.out.println("id = " + ids.get(i));
+		for (int i = 0; i < ids.size(); i++) {
+			// System.out.println("id = " + ids.get(i));
 		}
 		List<Movie> movies = new ArrayList<Movie>();
 		for (int i = 0; i < ids.size(); i++) {
 			posicao = hash.buscar(ids.get(i), false);
 			if (posicao != -1) {
-				System.out.println("pos = " + posicao);
+				// System.out.println("pos = " + posicao);
 				file.seek(posicao);
 				tamanho = file.readInt();
 				ba = new byte[tamanho];
@@ -178,21 +178,21 @@ public class CRUD {
 					file.seek(0);
 					file.writeInt(idMaximo);
 					j_temp.id = getMaxId();
+					for (int i = 0; i < j_temp.genre.length; i++) {
+						System.out.println("????????");
+						listaInvertida.inserir(j_temp.genre[i], j_temp.id); // inserir generos na lista invertida
+					}
 
 				}
 				if (isHash) {
 					hash.inserir(j_temp.id, false, posicao); // inserir no arquivo de indice hash
-					
+
 				}
 
 				file.seek(posicao + 4); // pular o tamanho
 
 				byte[] arr = j_temp.toByteArray();
 				file.write(arr);
-				for (int i = 0; i < j_temp.genre.length; i++) {
-					System.out.println("????????");
-					listaInvertida.inserir(j_temp.genre[i], j_temp.id); //inserir generos na lista invertida
-				}
 
 				System.out.println("id do filme inserido: " + j_temp.id);
 				return;
@@ -219,11 +219,13 @@ public class CRUD {
 		file.writeInt(ba.length);// escrever o tamanho
 
 		byte[] arr = j_temp.toByteArray();
-		for (int i = 0; i < j_temp.genre.length; i++) {
-			System.out.println("????????");
-			listaInvertida.inserir(j_temp.genre[i], j_temp.id); //inserir generos na lista invertidaa
-		}
 		file.write(arr);
+		if (!update) {
+			for (int i = 0; i < j_temp.genre.length; i++) {
+				System.out.println("????????");
+				listaInvertida.inserir(j_temp.genre[i], j_temp.id); // inserir generos na lista invertidaa
+			}
+		}
 
 		System.out.println("id do filme inserido: " + j_temp.id);
 		return;
@@ -298,7 +300,6 @@ public class CRUD {
 
 		j_temp = getFromPos(posicao);
 		String tmp = "";
-
 		// Percorre o arquivo em busca do movie com o ID especificado
 
 		System.out.println("qual atributo do filme voce deseja atualizar?");
@@ -378,8 +379,20 @@ public class CRUD {
 					System.out.println("Digite o " + (i + 1) + "º gênero + ENTER");
 					genre[i] = sc.nextLine();
 				}
-				
-
+				List<String> generosAntigos = Arrays.asList(j_temp.genre);
+				List<String> novosGeneros = Arrays.asList(genre);
+				List<String> paraInserir = new ArrayList<String>(novosGeneros);
+				paraInserir.removeAll(generosAntigos);
+				for (int i = 0; i < paraInserir.size(); i++) {
+					listaInvertida.inserir(paraInserir.get(i), j_temp.id); // inserir generos na lista invertida
+				}
+				generosAntigos = Arrays.asList(j_temp.genre);
+				novosGeneros = Arrays.asList(genre);
+				List<String> paraRemover = new ArrayList<String>(generosAntigos);
+				paraRemover.removeAll(novosGeneros);
+				for (int i = 0; i < paraRemover.size(); i++) {
+					listaInvertida.remover(paraRemover.get(i), j_temp.id);
+				}
 				// verificar se cabe
 				file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() + j_temp.certificate.length());
 
@@ -401,17 +414,18 @@ public class CRUD {
 				break;
 
 			case 0:
-				this.isHash = false;
-				// System.out.println("t arquivo = " + file.length());
-				remover(id);
-				inserir(j_temp.toByteArray(), true);
-				this.isHash = true;
-				int newPos = (apontar(id));
-				// System.out.println("newpos = " + newPos);
-				for (int i = 0; i < j_temp.genre.length; i++) {
-					listaInvertida.inserir(j_temp.genre[i], j_temp.id); //inserir generos na lista invertida
+				if (isHash) {
+					this.isHash = false;
+					// System.out.println("t arquivo = " + file.length());
+					remover(id, true);
+					inserir(j_temp.toByteArray(), true);
+					this.isHash = true;
+					int newPos = (apontar(id));
+					hash.atualizar(id, newPos);
+				} else {
+					remover(id, true);
+					inserir(j_temp.toByteArray(), true);
 				}
-				hash.atualizar(id, newPos);
 				System.out.println("Saindo...");
 				return;
 			default:
@@ -421,7 +435,7 @@ public class CRUD {
 
 	}
 
-	public Movie remover(int id) throws Exception {
+	public Movie remover(int id, boolean isUpdate) throws Exception {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao;
 		if (isHash) {
@@ -443,6 +457,11 @@ public class CRUD {
 			file.writeBoolean(true); // marca o movie como removido
 
 			j_temp.fromByteArray(ba);
+			if (!isUpdate) {
+				for (int i = 0; i < j_temp.genre.length; i++) {
+					listaInvertida.remover(j_temp.genre[i], id);
+				}
+			}
 
 			System.out.println("ITEM REMOVIDO!");
 		} else {
@@ -545,6 +564,7 @@ public class CRUD {
 
 					file.write(ba); // escreve o byte de arrays da entidade
 				}
+				this.listaInvertida = new ListaInvertida(true);
 				// file.seek(pos1);
 			} catch (Exception e) {
 				e.printStackTrace();

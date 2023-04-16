@@ -93,6 +93,11 @@ public class Movie {
 		dis.readInt();
 		String allGen = dis.readUTF();
 		genre = allGen.split(",");
+		for (int i = 1; i < genre.length; i++) {
+			if (genre[i].charAt(0) == ' ') {
+				genre[i] = genre[i].substring(1);
+			}
+		}
 		rating = dis.readFloat();
 		year = new Date(dis.readLong());
 
