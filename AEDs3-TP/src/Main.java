@@ -1,6 +1,6 @@
 import java.io.IOException;
 import java.util.Scanner;
-
+import java.util.*;
 
 public class Main {
 
@@ -8,7 +8,7 @@ public class Main {
 		init();
 	}
 
-	public static void init (){
+	public static void init() {
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			System.out.println("Selecione uma operação:");
@@ -21,7 +21,7 @@ public class Main {
 			switch (opcao) {
 
 			// listar
-			case 1: 
+			case 1:
 				interfac(0);
 				break;
 			case 2:
@@ -40,7 +40,7 @@ public class Main {
 
 	public static void interfac(int tipo) {
 		Scanner scanner = new Scanner(System.in);
-		
+
 		try {
 			CRUD crud = new CRUD("../data/arquivo.bin", tipo);
 
@@ -54,11 +54,12 @@ public class Main {
 				System.out.println("6 - Carga inicial");
 				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("8 - Ordenação externa");
-				//System.out.println("9 - Gerar lista invertida(gêneros)");
+				// System.out.println("9 - Gerar lista invertida(gêneros)");
 				System.out.println("0 - Sair");
-		
+
 				int id = 0;
 				Movie m_temp = new Movie();
+				List<Movie> filmes = new ArrayList<Movie>();
 				int opcao = scanner.nextInt();
 				scanner.nextLine(); // limpa o buffer do scanner
 				switch (opcao) {
@@ -66,10 +67,12 @@ public class Main {
 				// listar
 				case 1:
 					System.out.println("1 - Buscar por ID");
-					if (tipo == 0){
+					if (tipo == 0) {
 						System.out.println("2 - Buscar por título");
 					}
 					System.out.println("3 - Buscar por gênero");
+					System.out.println("4 - Buscar por diretor");
+					System.out.println("5 - Buscar por gênero e diretor");
 
 					int opco = scanner.nextInt();
 					scanner.nextLine(); // limpa o buffer do scanner
@@ -88,13 +91,34 @@ public class Main {
 					case 3:
 						System.out.println("Você quer pesquisar por quais gêneros?(usa lista invertida)");
 						String query = scanner.nextLine();
-						crud.buscarPorListaInvertida(query);
+						filmes = crud.buscarPorListaInvertida(query, 0);
+						break;
+					case 4:
+						System.out.println("Você quer pesquisar por quais diretores?(usa lista invertida");
+						String query2 = scanner.nextLine();
+						filmes = crud.buscarPorListaInvertida(query2, 1);
+						break;
+					case 5:
+						System.out.println("Você quer pesquisar por quais gêneros?");
+						String queryGen = scanner.nextLine();
+						System.out.println("Você quer pesquisar por quais diretores?");
+						String queryDir = scanner.nextLine();
+						filmes = crud.buscaDupla(queryGen, queryDir);
 						break;
 					default:
 						System.out.println("ERRO: opcao invalida");
 					}
 					if (m_temp != null) {
-						System.out.println(m_temp);
+						if (m_temp.id != -1) {
+							System.out.println(m_temp);
+						} else {
+							if (filmes.size() == 0) {
+								System.out.println("ERRO: filme não encontrado!");
+							}
+							for (int i = 0; i < filmes.size(); i++) {
+								System.out.println(filmes.get(i));
+							}
+						}
 					} else {
 						System.out.println("ERRO: filme não encontrado!");
 					}
@@ -136,7 +160,7 @@ public class Main {
 					break;
 				case 8:
 					try {
-						OrdenacaoExterna.externalSort("arquivo", 1260, 2); //estavel quando m > 1260 e n = 2
+						OrdenacaoExterna.externalSort("arquivo", 1260, 2); // estavel quando m > 1260 e n = 2
 						System.out.println("ARQUIVO ORDENADO!");
 					} catch (IOException e) {
 						e.printStackTrace();
