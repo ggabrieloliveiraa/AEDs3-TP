@@ -10,10 +10,12 @@ public class CRUD {
 	ListaInvertida listaInvertidaGen;
 	ListaInvertida listaInvertidaDir;
 	boolean isHash;
+	ArvoreBP arvore;
 
 	public CRUD(String nomeArquivo, int tipo) throws Exception {
 		String tmp = nomeArquivo;
 		this.file = new RandomAccessFile(tmp, "rw");
+		//this.arvore = new ArvoreBP();
 		if (tipo == 1) {
 			isHash = true;
 			if (file.length() == 0) {
@@ -73,7 +75,7 @@ public class CRUD {
 			}
 			for (int i = 0; i < gen.length; i++) {
 				if (!listaGen.contains(gen[i])) {
-					System.out.println("CRUD // " + gen[i]);
+					//System.out.println("CRUD // " + gen[i]);
 					listaGen.add(gen[i]);
 				}
 			}
@@ -115,7 +117,7 @@ public class CRUD {
 			String[] dir = diretores.split(" ");
 			for (int i = 0; i < dir.length; i++) {
 				if (!listaDir.contains(dir[i])) {
-					System.out.println("CRUD // " + dir[i]);
+					//System.out.println("CRUD // " + dir[i]);
 					listaDir.add(dir[i]);
 				}
 			}
@@ -269,7 +271,7 @@ public class CRUD {
 					}
 					String[] dir = j_temp.director.split(" ");
 					for (int i = 0; i < dir.length; i++) {
-						listaInvertidaDir.remover(dir[i], j_temp.id);
+						listaInvertidaDir.inserir(dir[i], j_temp.id);
 					}
 
 				}
@@ -316,7 +318,7 @@ public class CRUD {
 			}
 			String[] dir = j_temp.director.split(" ");
 			for (int i = 0; i < dir.length; i++) {
-				listaInvertidaDir.remover(dir[i], j_temp.id);
+				listaInvertidaDir.inserir(dir[i], j_temp.id);
 			}
 		}
 
@@ -333,6 +335,9 @@ public class CRUD {
 			posicao = apontar(id);
 		}
 		int tamanho;
+
+		//System.out.println("BUSCANDO POR ARVORE");
+		//arvore.buscar(id);
 
 		// System.out.println(posicao);
 
@@ -672,16 +677,22 @@ public class CRUD {
 			}
 			try {
 				Hash hash = new Hash(true);
+				//this.arvore = new ArvoreBP();
 				for (int i = 0; i < filmes.size(); i++) {
 					ba = filmes.get(i).toByteArray();
 					// System.out.println(filmes.get(i));
 					hash.inserir(filmes.get(i).id, false, (int) file.getFilePointer());
+
+					//arvore.inserir(filmes.get(i).id, (int) file.getFilePointer());
+
 					file.writeInt(ba.length); // escreve tamanho da entidade
 
 					file.write(ba); // escreve o byte de arrays da entidade
-				}
+				}			
 				this.listaInvertidaGen = new ListaInvertida(true, 0);
 				this.listaInvertidaDir = new ListaInvertida(true, 1);
+
+				//arvore.buscar(5);
 				// file.seek(pos1);
 			} catch (Exception e) {
 				e.printStackTrace();

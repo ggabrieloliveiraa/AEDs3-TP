@@ -61,26 +61,19 @@ public class Hash {
 
 	public void inserir(int id, boolean lapide, int pos) throws Exception {
 		Scanner sc = new Scanner(System.in);
-		// RandomAccessFile bucket = new RandomAccessFile("../data/bucket.bin", "rw");
-		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
-		// System.out.println("PROFUNDIADE = " + profundidade);
-		// System.out.println("this.p = " + this.p);
-		// System.out.println("id = " + id);
 		int hash = hash(id);
 		int dirPesq = 4 + (4 * hash);
-		//System.out.println("disPesq = " + dirPesq);
+
 		dir.seek(dirPesq); // vai pra posicao onde tem o endereco que aponta pro bucket(cabeçalho + 4 *
 								// tamanho endereço)
 		int bucketAdress = dir.readInt(); // ler o endereço que aponta pro bucket que quer
-		// System.out.println("ba = " + bucketAdress);
+
 		bucket.seek(bucketAdress);
 		int pBucket = bucket.readInt();
-		// System.out.println("pbucket = " + pBucket);
+
 		int tamanho = bucket.readInt();
-		// System.out.println("tb = " + tamanho);
 		if (tamanho < 504) {
-			//System.out.println("ba = " + bucketAdress);
-			//System.out.println(id);
+			// se couber no arquivo de bucket
 			bucket.seek(bucket.getFilePointer() + (tamanho * 9));
 			bucket.writeInt(id);
 			bucket.writeBoolean(false); // lapide
@@ -89,8 +82,6 @@ public class Hash {
 			tamanho++;
 			bucket.writeInt(tamanho);
 		} else if (pBucket == profundidade) {
-			//System.out.println("pbucket == profundidade");
-			// System.out.println("ba = " + bucketAdress);
 			// se profundidade local for igual a profundidade global, aumenta o diretorio
 			bucket.seek(bucket.getFilePointer() - 8);
 			pBucket++;
@@ -116,38 +107,26 @@ public class Hash {
 			bucket.writeInt(0);
 			int bucketPos = (int) bucket.getFilePointer();
 			int pAntigo = (int) Math.pow(2, (profundidade - 1));
-			// PROBLEMA AQUI!
-			//dir.seek(dir.length() - 4);
-			//System.out.println("hash = " + hash);
+
 			int lastB = getLastBucket();
-			//System.out.println("lastB = " + lastB);
+
 			int newLastB = lastB + 8 + (9 * bucketSize);
 			int maiorDir = (int)dir.length() - 4;
-			//System.out.println("pr = " + p);
-			//System.out.println("maiorDir = " + maiorDir);
+
 			int dirAtual = 4 + 4 * hash;
 			int dirNovo = dirAtual + pAntigo * 4;
-			//System.out.println("dir atual = " + dirAtual); //PROBLEMA POR AQUI!!!
 			dir.seek(dirNovo); // ir para ponteiro que vai apontar para o novo bucket(!!!)
-			//System.out.println("dir novo = " + dirNovo);
-			// long bL = bucket.length();
-			// System.out.println("bl = " + bL);
-			// System.out.println("bl(int = " + (int)bL);
-			//System.out.println("newLastB = " + newLastB);
-			//System.out.println("p = " + bucketAdress);
-			//System.out.println("dirp = " + dir.getFilePointer());
 			dir.writeInt(newLastB); // tava bucket.length aqui antes, errado pq o ultimo bucket pode nao estar cheio
 			dir.getFD().sync();
 			dir.seek(dir.getFilePointer() - 4);
 			int wtf = dir.readInt();
-			//System.out.println("wtf??? = " + wtf);
+
 			bucket.seek(newLastB);
 			bucket.writeInt(pBucket);
 			bucket.writeInt(0);
-			//System.out.println("tchauuu");
+
 			redistribuir(bucketPos);
 			inserir(id, false, pos); //AQUI TA FICANDO INFINITO!!!
-			//System.out.println("oieeee");
 		}
 	}
 	public int getLastBucket () throws Exception{
@@ -201,54 +180,32 @@ public class Hash {
 			registros[i] = new Registro(idR, lapideR, posicaoR);
 		}
 		for (int i = 0; i < bucketSize; i++) { // reinsere os registros com o novo diretorio
-			// System.out.println("id gay = " + registros[i].id);
 			inserir(registros[i].id, registros[i].lapide, registros[i].pos);
 		}
-		/*
-		for (int i = 0; i < bucketSize; i++) { // reinsere os registros com o novo diretorio
-			int hash = hash(registros[i].id);
-			dir.seek(4 + 4 * hash); // vai pra posicao onde tem o endereco que aponta pro bucket(cabeçalho + 4 *
-									// tamanho endereço)
-			// System.out.println("haxixe uvinha = " + hash);
-			int bucketAdress = dir.readInt(); // ler o endereço que aponta pro bucket que quer
-			// System.out.println("ba = " + bucketAdress);
-			bucket.seek(bucketAdress);
-			bucket.readInt();
-			// System.out.println("pbucket = " + pBucket);
-			int tamanho = bucket.readInt();
-			// System.out.println("tb = " + tamanho);
-			// System.out.println(id);
-			bucket.seek(bucket.getFilePointer() + (tamanho * 9));
-			bucket.writeInt(registros[i].id);
-			bucket.writeBoolean(registros[i].lapide); // lapide
-			bucket.writeInt(registros[i].pos);
-			bucket.seek(bucketAdress + 4);
-			tamanho++;
-			bucket.writeInt(tamanho);
-		}
-		*/
 	}
 
+
+	// Método para buscar um registro no arquivo de bucket e retornar sua posição
+	// Se remover for true, remove o registro caso seja encontrado
 	public int buscar(int id, boolean remover) throws Exception {
-		// RandomAccessFile bucket = new RandomAccessFile("../data/bucket.bin", "rw");
-		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
 		int hash = hash(id);
 		dir.seek(4 + hash * 4);
 		int posBucket = dir.readInt();
 		bucket.seek(posBucket + 4);
 		int tamanho = bucket.readInt();
-		//System.out.println("t = " + tamanho);
+		// Percorre todos os registros do bucket buscando pelo registro com o ID desejado
 		for (int i = 0; i < tamanho; i++) {
 			int bucketId = bucket.readInt();
-			//System.out.println("bi = " + bucketId);
+
 			boolean lapide = bucket.readBoolean();
 			int pos = bucket.readInt();
-			//System.out.println("posbucket = " + pos);
+
 			if (bucketId == id && lapide == false) {
 				if (remover){ //se for remover o registr
 					bucket.seek(bucket.getFilePointer() - 5);
 					bucket.writeBoolean(true);
 				}
+				// Retorna a posição do registro atual
 				return pos;
 			}
 		}
@@ -263,13 +220,15 @@ public class Hash {
 		bucket.seek(posBucket + 4);
 		int tamanho = bucket.readInt();
 
+		// Itera sobre todos os registros no bucket
 		for (int i = 0; i < tamanho; i++) {
 			int bucketId = bucket.readInt();
 			boolean lapide = bucket.readBoolean();
 			int posi = bucket.readInt();
 
+			// Caso encontre o registro com o ID desejado, posiciona-se no 
+			//início desse registro e atualiza-se a posição
 			if (bucketId == id) {
-				//System.out.println("posi = " + posi);
 				bucket.seek(bucket.getFilePointer() - 5);
 				bucket.writeBoolean(false);
 				bucket.writeInt(pos);				
@@ -277,10 +236,13 @@ public class Hash {
 		}
 	}
 
+
+	// Método hash que calcula o valor do hash para o ID do registro
 	private int hash(int k) throws Exception {
-		// RandomAccessFile dir = new RandomAccessFile("../data/dir.bin", "rw");
 		dir.seek(0);
 		int profundidade = dir.readInt();
+
+		// Calcula-se o valor do hash a partir do resto da divisão do ID pelo tamanho 
 		int p = (int) Math.pow(2, profundidade);
 		return (k % p);
 	}

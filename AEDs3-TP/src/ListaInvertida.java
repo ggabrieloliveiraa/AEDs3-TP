@@ -14,7 +14,7 @@ public class ListaInvertida {
 		this.tipo = tipo;
 		abrirArquivo();
 		if (palavras.length() == 0) {// se nao existir o arquivo listainvertida ainda
-			preencherCringe();
+			preencher();
 			System.out.println("Lista invertida criada!");
 		} else if (isCargaInicial) {
 			deletarArquivo();
@@ -24,14 +24,14 @@ public class ListaInvertida {
 
 	public void deletarArquivo() throws Exception {
 		if (this.tipo == 0) {
-			File p = new File("palavrasGen.bin");
-			File i = new File("indicesGen.bin");
+			File p = new File("../data/palavrasGen.bin");
+			File i = new File("../data/indicesGen.bin");
 			p.delete();
 			i.delete();
 			abrirArquivo();
 		} else if (this.tipo == 1) {
-			File p = new File("palavrasDir.bin");
-			File i = new File("indicesDir.bin");
+			File p = new File("../data/palavrasDir.bin");
+			File i = new File("../data/indicesDir.bin");
 			p.delete();
 			i.delete();
 		}
@@ -47,7 +47,7 @@ public class ListaInvertida {
 		}
 	}
 
-	public void preencherCringe() throws Exception {
+	public void preencher() throws Exception {//preencherCringe F 
 		ArrayList<PalavraIndexada> palavrasIn;
 		abrirArquivo();
 		CRUD crud = new CRUD("../data/arquivo.bin", 0);
@@ -90,19 +90,6 @@ public class ListaInvertida {
 				}
 			}
 		}
-	}
-
-	public void preencher() throws Exception { // nao consegui fazer funcionar mas se conseguir é poggers
-		this.palavras = new RandomAccessFile("../data/palavras.bin", "rw");
-		this.indices = new RandomAccessFile("../data/indices.bin", "rw");
-		CRUD crud = new CRUD("../data/arquivo.bin", 0);
-		ArrayList<PalavraIndexada> palavrasIn = crud.getPalavrasIndexadas();
-		for (int i = 0; i < palavrasIn.size(); i++) {
-			for (int j = 0; j < palavrasIn.get(i).id.size(); j++) {
-				inserir(palavrasIn.get(i).palavra, palavrasIn.get(i).id.get(j));
-			}
-		}
-		crud.fechar();
 	}
 
 	public void goToNextLista() throws Exception { // pula para a proxima lista(vai ate o final e le o ponteiro)

@@ -67,15 +67,18 @@ public class Main {
 				// listar
 				case 1:
 					System.out.println("1 - Buscar por ID");
-					if (tipo == 0) {
-						System.out.println("2 - Buscar por título");
-					}
-					System.out.println("3 - Buscar por gênero");
-					System.out.println("4 - Buscar por diretor");
-					System.out.println("5 - Buscar por gênero e diretor");
+					System.out.println("2 - Buscar por título");
+					if (tipo == 1){
+						System.out.println("3 - Buscar por gênero");
+						System.out.println("4 - Buscar por diretor");
+						System.out.println("5 - Buscar por gênero e diretor");
+					}	
 
 					int opco = scanner.nextInt();
 					scanner.nextLine(); // limpa o buffer do scanner
+					if (tipo == 0 && opco > 2){
+						opco = 6;
+					}
 					switch (opco) {
 					case 1:
 						System.out.println("Maior ID = " + crud.getMaxId());
