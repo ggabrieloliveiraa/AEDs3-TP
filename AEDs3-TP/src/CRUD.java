@@ -7,12 +7,15 @@ import java.io.File;
 public class CRUD {
 	private RandomAccessFile file;
 	Hash hash;
-	ListaInvertida listaInvertida;
+	ListaInvertida listaInvertidaGen;
+	ListaInvertida listaInvertidaDir;
 	boolean isHash;
+	ArvoreBP arvore;
 
 	public CRUD(String nomeArquivo, int tipo) throws Exception {
 		String tmp = nomeArquivo;
 		this.file = new RandomAccessFile(tmp, "rw");
+		//this.arvore = new ArvoreBP();
 		if (tipo == 1) {
 			isHash = true;
 			if (file.length() == 0) {
@@ -26,7 +29,8 @@ public class CRUD {
 			isHash = false;
 		}
 		if (tipo == 1) {
-			this.listaInvertida = new ListaInvertida();
+			this.listaInvertidaGen = new ListaInvertida(false, 0);
+			this.listaInvertidaDir = new ListaInvertida(false, 1);
 		}
 	}
 
@@ -42,7 +46,7 @@ public class CRUD {
 	String getGeneros() throws Exception {
 		file.readBoolean(); // lapide
 		int id = file.readInt(); // id
-		//System.out.println(id);
+		// System.out.println(id);
 		file.readUTF(); // title
 		file.readUTF(); // director
 		// file.seek(file.getFilePointer() + 9); // certificado(string tamanho fixo)
@@ -67,11 +71,11 @@ public class CRUD {
 			String[] gen = allGen.split(",");
 			for (int i = 1; i < gen.length; i++) {
 				gen[i] = gen[i].substring(1); // tirar o espaço antes do gen dps do primeiro(passar isso pro movie dps)
-				//System.out.println("gi = " + gen[i]);
+				// System.out.println("gi = " + gen[i]);
 			}
 			for (int i = 0; i < gen.length; i++) {
 				if (!listaGen.contains(gen[i])) {
-					System.out.println("CRUD // " + gen[i]);
+					//System.out.println("CRUD // " + gen[i]);
 					listaGen.add(gen[i]);
 				}
 			}
@@ -84,6 +88,78 @@ public class CRUD {
 
 	}
 
+	String getDiretores() throws Exception {
+		file.readBoolean(); // lapide
+		int id = file.readInt(); // id
+		// System.out.println(id);
+		file.readUTF(); // title
+		String director = file.readUTF(); // director
+		// file.seek(file.getFilePointer() + 9); // certificado(string tamanho fixo)
+		byte[] stringBytes = new byte[9];
+		file.readFully(stringBytes); // ler certificado
+		file.readInt(); // ler quantidade de generos
+		String allGen = file.readUTF(); // ler generos
+		return director;
+	}
+
+	public ArrayList<String> lerDiretores() throws Exception { // cria uma lista sem repetir com todos os generos que
+																// tem
+		int posicao = 4;
+		int tamanho = 0;
+		ArrayList<String> listaDir = new ArrayList<>();
+
+		while (posicao < file.length()) { // sempre da problema na ultima iteração por algum motivo
+
+			file.seek(posicao);
+			tamanho = file.readInt();
+			String diretores = getDiretores();
+			// System.out.println("ag = " + allGen);
+			String[] dir = diretores.split(" ");
+			for (int i = 0; i < dir.length; i++) {
+				if (!listaDir.contains(dir[i])) {
+					//System.out.println("CRUD // " + dir[i]);
+					listaDir.add(dir[i]);
+				}
+			}
+			posicao += tamanho + 4;
+		}
+		return listaDir;
+	}
+
+	public ArrayList<PalavraIndexada> getPalavrasIndexadasDir() throws Exception {
+		int posicao = 4;
+		int tamanho = 0;
+		ArrayList<String> dicionario = lerDiretores();
+		ArrayList<PalavraIndexada> pi = new ArrayList<PalavraIndexada>();
+		for (int i = 0; i < dicionario.size(); i++) {
+			pi.add(new PalavraIndexada(dicionario.get(i))); // adiciona as palavras do dicionario
+		}
+		while (posicao < file.length()) {
+			file.seek(posicao);
+			// System.out.println("p = " + posicao);
+			tamanho = file.readInt();
+			// System.out.println("t = " + tamanho);
+			// System.out.println("fl = " + file.length());
+			file.readBoolean(); // lapide
+			int id = file.readInt(); // id
+			file.readUTF(); // title
+			String diretor = file.readUTF(); // director
+			file.seek(file.getFilePointer() + 9); // certificado(string tamanho fixo)
+			file.readInt(); // ler quantidade de generos
+			file.readUTF(); // ler generos
+			String[] dir = diretor.split(" ");
+			for (int i = 0; i < dir.length; i++) {
+				for (int j = 0; j < pi.size(); j++) {
+					if (pi.get(j).palavra.equals(dir[i])) { // quando a palavra for igual a do dicionario, adicionar id
+						pi.get(j).addId(id);
+					}
+				}
+			}
+			posicao += tamanho + 4;
+		}
+		return pi;
+	}
+
 	public ArrayList<PalavraIndexada> getPalavrasIndexadas() throws Exception {
 		int posicao = 4;
 		int tamanho = 0;
@@ -94,10 +170,10 @@ public class CRUD {
 		}
 		while (posicao < file.length()) {
 			file.seek(posicao);
-			//System.out.println("p = " + posicao);
+			// System.out.println("p = " + posicao);
 			tamanho = file.readInt();
-			//System.out.println("t = " + tamanho);
-			//System.out.println("fl = " + file.length());
+			// System.out.println("t = " + tamanho);
+			// System.out.println("fl = " + file.length());
 			file.readBoolean(); // lapide
 			int id = file.readInt(); // id
 			file.readUTF(); // title
@@ -121,23 +197,36 @@ public class CRUD {
 		return pi;
 	}
 
-	public void buscarPorListaInvertida(String query) throws Exception {
-		ArrayList<Integer> ids = listaInvertida.buscar(query);
-		buscarPorIds(ids);
+	public List<Movie> buscaDupla(String query1, String query2) throws Exception {
+		ArrayList<Integer> idsGen = listaInvertidaGen.buscar(query1);
+		ArrayList<Integer> result = listaInvertidaDir.buscar(query2);
+		result.retainAll(idsGen); // interseção com a lista invertida da próxima palavra
+		return buscarPorIds(result);
 	}
 
-	public void buscarPorIds(ArrayList<Integer> ids) throws Exception {
+	public List<Movie> buscarPorListaInvertida(String query, int tipo) throws Exception {
+		ArrayList<Integer> ids;
+		if (tipo == 0) { // buscar por genero
+			ids = listaInvertidaGen.buscar(query);
+		} else { // buscar por diretor
+			System.out.println("aaaaaaaaaa");
+			ids = listaInvertidaDir.buscar(query);
+		}
+		return buscarPorIds(ids);
+	}
+
+	public List<Movie> buscarPorIds(ArrayList<Integer> ids) throws Exception {
 		int posicao = 4;
 		int tamanho = 0;
 		byte ba[];
-		for (int i = 0; i < ids.size(); i++){
-			//System.out.println("id = " + ids.get(i));
+		for (int i = 0; i < ids.size(); i++) {
+			// System.out.println("id = " + ids.get(i));
 		}
 		List<Movie> movies = new ArrayList<Movie>();
 		for (int i = 0; i < ids.size(); i++) {
 			posicao = hash.buscar(ids.get(i), false);
 			if (posicao != -1) {
-				System.out.println("pos = " + posicao);
+				// System.out.println("pos = " + posicao);
 				file.seek(posicao);
 				tamanho = file.readInt();
 				ba = new byte[tamanho];
@@ -148,9 +237,7 @@ public class CRUD {
 				movies.add(j_temp);
 			}
 		}
-		for (int i = 0; i < movies.size(); i++) {
-			System.out.println(movies.get(i));
-		}
+		return movies;
 	}
 
 	public void inserir(byte[] ba, boolean update) throws Exception {
@@ -178,11 +265,19 @@ public class CRUD {
 					file.seek(0);
 					file.writeInt(idMaximo);
 					j_temp.id = getMaxId();
+					for (int i = 0; i < j_temp.genre.length; i++) {
+						System.out.println("????????");
+						listaInvertidaGen.inserir(j_temp.genre[i], j_temp.id); // inserir generos na lista invertida
+					}
+					String[] dir = j_temp.director.split(" ");
+					for (int i = 0; i < dir.length; i++) {
+						listaInvertidaDir.inserir(dir[i], j_temp.id);
+					}
 
 				}
 				if (isHash) {
 					hash.inserir(j_temp.id, false, posicao); // inserir no arquivo de indice hash
-					
+
 				}
 
 				file.seek(posicao + 4); // pular o tamanho
@@ -216,6 +311,16 @@ public class CRUD {
 
 		byte[] arr = j_temp.toByteArray();
 		file.write(arr);
+		if (!update) {
+			for (int i = 0; i < j_temp.genre.length; i++) {
+				System.out.println("????????");
+				listaInvertidaGen.inserir(j_temp.genre[i], j_temp.id); // inserir generos na lista invertidaa
+			}
+			String[] dir = j_temp.director.split(" ");
+			for (int i = 0; i < dir.length; i++) {
+				listaInvertidaDir.inserir(dir[i], j_temp.id);
+			}
+		}
 
 		System.out.println("id do filme inserido: " + j_temp.id);
 		return;
@@ -230,6 +335,9 @@ public class CRUD {
 			posicao = apontar(id);
 		}
 		int tamanho;
+
+		//System.out.println("BUSCANDO POR ARVORE");
+		//arvore.buscar(id);
 
 		// System.out.println(posicao);
 
@@ -290,7 +398,6 @@ public class CRUD {
 
 		j_temp = getFromPos(posicao);
 		String tmp = "";
-
 		// Percorre o arquivo em busca do movie com o ID especificado
 
 		System.out.println("qual atributo do filme voce deseja atualizar?");
@@ -320,6 +427,22 @@ public class CRUD {
 			case 2:
 				System.out.println("Novo diretor: ");
 				tmp = sc.nextLine();
+				String[] tmpSplit = tmp.split(" ");
+				String[] dir = j_temp.director.split(" ");
+				List<String> diretoresAntigos = Arrays.asList(dir);
+				List<String> novosDiretores = Arrays.asList(tmpSplit);
+				List<String> paraInserir = new ArrayList<String>(novosDiretores);
+				paraInserir.removeAll(diretoresAntigos);
+				for (int i = 0; i < paraInserir.size(); i++) {
+					listaInvertidaDir.inserir(paraInserir.get(i), j_temp.id); // inserir generos na lista invertida
+				}
+				diretoresAntigos = Arrays.asList(dir);
+				novosDiretores = Arrays.asList(tmpSplit);
+				List<String> paraRemover = new ArrayList<String>(diretoresAntigos);
+				paraRemover.removeAll(novosDiretores);
+				for (int i = 0; i < paraRemover.size(); i++) {
+					listaInvertidaDir.remover(paraRemover.get(i), j_temp.id);
+				}
 
 				j_temp.director = tmp;
 
@@ -371,6 +494,22 @@ public class CRUD {
 					genre[i] = sc.nextLine();
 				}
 
+				List<String> generosAntigos = Arrays.asList(j_temp.genre);
+				List<String> novosGeneros = Arrays.asList(genre);
+				paraInserir = new ArrayList<String>(novosGeneros);
+				paraInserir.removeAll(generosAntigos);
+				for (int i = 0; i < paraInserir.size(); i++) {
+					listaInvertidaGen.inserir(paraInserir.get(i), j_temp.id); // inserir generos na lista invertida
+				}
+
+				generosAntigos = Arrays.asList(j_temp.genre);
+				novosGeneros = Arrays.asList(genre);
+				paraRemover = new ArrayList<String>(generosAntigos);
+				paraRemover.removeAll(novosGeneros);
+				for (int i = 0; i < paraRemover.size(); i++) {
+					listaInvertidaGen.remover(paraRemover.get(i), j_temp.id);
+				}
+
 				// verificar se cabe
 				file.seek(posicao + 9 + j_temp.title.length() + j_temp.director.length() + j_temp.certificate.length());
 
@@ -392,14 +531,18 @@ public class CRUD {
 				break;
 
 			case 0:
-				this.isHash = false;
-				// System.out.println("t arquivo = " + file.length());
-				remover(id);
-				inserir(j_temp.toByteArray(), true);
-				this.isHash = true;
-				int newPos = (apontar(id));
-				// System.out.println("newpos = " + newPos);
-				hash.atualizar(id, newPos);
+				if (isHash) {
+					this.isHash = false;
+					// System.out.println("t arquivo = " + file.length());
+					remover(id, true);
+					inserir(j_temp.toByteArray(), true);
+					this.isHash = true;
+					int newPos = (apontar(id));
+					hash.atualizar(id, newPos);
+				} else {
+					remover(id, true);
+					inserir(j_temp.toByteArray(), true);
+				}
 				System.out.println("Saindo...");
 				return;
 			default:
@@ -409,7 +552,7 @@ public class CRUD {
 
 	}
 
-	public Movie remover(int id) throws Exception {
+	public Movie remover(int id, boolean isUpdate) throws Exception {
 		// Percorre o arquivo em busca do movie com o ID especificado
 		int posicao;
 		if (isHash) {
@@ -431,6 +574,15 @@ public class CRUD {
 			file.writeBoolean(true); // marca o movie como removido
 
 			j_temp.fromByteArray(ba);
+			if (!isUpdate) {
+				for (int i = 0; i < j_temp.genre.length; i++) {
+					listaInvertidaGen.remover(j_temp.genre[i], id);
+				}
+				String[] dir = j_temp.director.split(" ");
+				for (int i = 0; i < dir.length; i++) {
+					listaInvertidaDir.remover(dir[i], id);
+				}
+			}
 
 			System.out.println("ITEM REMOVIDO!");
 		} else {
@@ -525,14 +677,22 @@ public class CRUD {
 			}
 			try {
 				Hash hash = new Hash(true);
+				//this.arvore = new ArvoreBP();
 				for (int i = 0; i < filmes.size(); i++) {
 					ba = filmes.get(i).toByteArray();
 					// System.out.println(filmes.get(i));
 					hash.inserir(filmes.get(i).id, false, (int) file.getFilePointer());
+
+					//arvore.inserir(filmes.get(i).id, (int) file.getFilePointer());
+
 					file.writeInt(ba.length); // escreve tamanho da entidade
 
 					file.write(ba); // escreve o byte de arrays da entidade
-				}
+				}			
+				this.listaInvertidaGen = new ListaInvertida(true, 0);
+				this.listaInvertidaDir = new ListaInvertida(true, 1);
+
+				//arvore.buscar(5);
 				// file.seek(pos1);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -587,7 +747,7 @@ public class CRUD {
 
 	public void cargaInicialRandom() {
 		int[] id = aleatorizar(10064);
-		List<Movie> filmes = readCsv("movies.csv", id);
+		List<Movie> filmes = readCsv("../data/movies.csv", id);
 		byte ba[];
 		try {
 			if (file.length() == 0) {
