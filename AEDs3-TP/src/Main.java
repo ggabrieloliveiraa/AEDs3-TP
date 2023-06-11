@@ -54,7 +54,7 @@ public class Main {
 				System.out.println("6 - Carga inicial");
 				System.out.println("7 - Carga inicial com IDs aleatorios");
 				System.out.println("8 - Ordenação externa");
-				// System.out.println("9 - Gerar lista invertida(gêneros)");
+				System.out.println("9 - Casamento de padroes");
 				System.out.println("0 - Sair");
 
 				int id = 0;
@@ -68,15 +68,14 @@ public class Main {
 				case 1:
 					System.out.println("1 - Buscar por ID");
 					System.out.println("2 - Buscar por título");
-					if (tipo == 1){
+					if (tipo == 1) {
 						System.out.println("3 - Buscar por gênero");
 						System.out.println("4 - Buscar por diretor");
 						System.out.println("5 - Buscar por gênero e diretor");
-					}	
-
+					}
 					int opco = scanner.nextInt();
 					scanner.nextLine(); // limpa o buffer do scanner
-					if (tipo == 0 && opco > 2){
+					if (tipo == 0 && opco > 2) {
 						opco = 6;
 					}
 					switch (opco) {
@@ -108,6 +107,7 @@ public class Main {
 						String queryDir = scanner.nextLine();
 						filmes = crud.buscaDupla(queryGen, queryDir);
 						break;
+						
 					default:
 						System.out.println("ERRO: opcao invalida");
 					}
@@ -149,7 +149,7 @@ public class Main {
 					m_temp = crud.remover(id, false);
 					break;
 				case 5:
-					crud.mostrarTudo("../data/arquivo.bin", 4);
+					crud.mostrarTudo("arquivo1.bin", 4);
 					break;
 				case 6:
 					crud.cargaInicial();
@@ -170,6 +170,26 @@ public class Main {
 					}
 					interfac(tipo);
 					return;
+					/*
+				case 9:
+					crud.criarTxt();
+					break;
+				case 10:
+					LZW lzw = new LZW();
+				    lzw.compress();
+				    break;
+				case 11:
+					LZW lzwD = new LZW();
+					lzwD.descompactar();
+					break;
+					*/
+				case 9:
+					System.out.println("Padrão a ser pesquisado: ");
+					String padrao = scanner.nextLine();
+					CasamentoPadroes buscaPadroes = new CasamentoPadroes(padrao);
+					buscaPadroes.buscar(padrao);
+					break;
+					
 				case 0:
 					System.out.println("Saindo...");
 					crud.fechar();
