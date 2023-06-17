@@ -15,7 +15,16 @@ public class Movie {
 	protected String[] genre;
 	protected float rating;
 	protected java.util.Date year;
-
+	public Movie(boolean lapide, int id, String title, String certificate, String[] genre, float rating,
+			String director) {
+		this.lapide = lapide;
+		this.id = id;
+		this.title = title;
+		this.director = director;
+		this.certificate = certificate;
+		this.genre = genre;
+		this.rating = rating;
+	}
 	public Movie(boolean lapide, int id, String title, int year, String certificate, String[] genre, float rating,
 			String director) {
 		this.lapide = lapide;
@@ -45,6 +54,19 @@ public class Movie {
 		this.genre = "a,b".split(",");
 		this.rating = 0F;
 		this.year = parseDate(2005);
+	}
+	
+	public String[] getAtributos() {
+		String[] atributos = new String[8];
+		atributos[0] = this.lapide + "";
+		atributos[1] = this.id + "";
+		atributos[2] = this.title;
+		atributos[3] = this.director;
+		atributos[4] = this.certificate;
+		atributos[5] = Arrays.toString(genre);
+		atributos[6] = this.rating + "";
+		atributos[7] = this.year + "";
+		return atributos;
 	}
 
 	@Override
@@ -78,7 +100,7 @@ public class Movie {
 	}
 
 	public void fromByteArray(byte ba[]) throws IOException {
-
+		
 		ByteArrayInputStream bais = new ByteArrayInputStream(ba);
 		DataInputStream dis = new DataInputStream(bais);
 

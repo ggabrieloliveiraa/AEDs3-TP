@@ -39,7 +39,7 @@ public class OrdenacaoExterna {
 		}
 		RandomAccessFile input = new RandomAccessFile(filename + ".bin", "rw");
 		for (int i = 0; i < n; i++) { // cria os n arquivos
-			RandomAccessFile output = new RandomAccessFile(filename + (i + 1) + "tmp.bin", "rw");
+			RandomAccessFile output = new RandomAccessFile("../data/" + filename + (i + 1) + "tmp.bin", "rw");
 			arqs[i] = filename + (i + 1) + "tmp.bin";
 			output.close();
 		}
@@ -84,7 +84,7 @@ public class OrdenacaoExterna {
 		CRUD crud = new CRUD("../data/arquivo.bin", 0);
 		int maxId = crud.getMaxId();
 		int n = inputFiles.length;
-		String filename = "../data/arquivo";
+		String filename = "../data/arquivo"; 
 		String[] arqS = new String[n * 2];
 		for (int i = 0; i < n; i++) {
 			arqS[i] = inputFiles[i];
