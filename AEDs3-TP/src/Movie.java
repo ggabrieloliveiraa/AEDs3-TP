@@ -77,6 +77,11 @@ public class Movie {
 	}
 
 	public byte[] toByteArray() throws IOException {
+		RSA rsa = new RSA();
+		rsa.encryptRSA(this, true);
+/* */
+		VGN vgn = new VGN();
+		this.director = vgn.encrypt(this.director, "KEY");
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
@@ -123,5 +128,10 @@ public class Movie {
 		rating = dis.readFloat();
 		year = new Date(dis.readLong());
 
+		VGN vgn = new VGN();
+		this.director = vgn.decrypt(this.director, "KEY");
+
+		RSA rsa = new RSA();
+		rsa.encryptRSA(this, false);
 	}
 }
