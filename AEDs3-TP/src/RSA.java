@@ -16,10 +16,10 @@ public class RSA {
 
         if (option == true){
         // Criptografar os campos de texto do objeto
-        Movie encryptedMovie = encryptFields(j_temp);
+        Movie encryptedMovie = encryptFields(j_temp); // Criptografa os campos de texto do objeto
         } else {
         // Descriptografar os campos do objeto criptografado
-        Movie decryptedMovie = decryptFields(j_temp);
+        Movie decryptedMovie = decryptFields(j_temp); // Descriptografa os campos do objeto criptografado
 
         }
         
@@ -34,6 +34,7 @@ public class RSA {
         return file.exists();
     }
 
+    /* SALVA AS NOVAS CHAVES NO ARQUIVO */
     private void saveKeysToFile() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("keysRSA.txt"));
@@ -48,6 +49,7 @@ public class RSA {
         }
     }
 
+    /* ABRE O ARQUIVO E PEGA AS CHAVES QUE ESTÃO CADASTRADAS */
     private void loadKeysFromFile() {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("keysRSA.txt"));
@@ -61,7 +63,7 @@ public class RSA {
     }
 
 
-
+    /* GERAÇÃO DAS CHAVES */
     public void generateKeys() {
         if (checkKeyFileExists()) {
             loadKeysFromFile();
@@ -83,11 +85,11 @@ public class RSA {
 
 
     public Movie encryptFields(Movie j_temp) {
-        String encTitle = encryptText(j_temp.title);
+        String encTitle = encryptText(j_temp.title); // Criptografa o título
         
         String[] encGenre = new String[j_temp.genre.length];
         for (int i = 0; i < j_temp.genre.length; i++){
-            encGenre[i] = encryptText(j_temp.genre[i]);
+            encGenre[i] = encryptText(j_temp.genre[i]); // Criptografa cada gênero
         }
         j_temp.title = encTitle;
         
@@ -95,34 +97,34 @@ public class RSA {
 
         //System.out.println(j_temp);
         //int encryptedAge = encryptInteger(person.getAge());
-        return (j_temp);
+        return (j_temp); // Retorna o objeto criptografado
     }
 
     public String encryptText(String text) {
         BigInteger textValue = new BigInteger(text.getBytes());
-        BigInteger encryptedValue = textValue.modPow(publicKey, modulus);
+        BigInteger encryptedValue = textValue.modPow(publicKey, modulus); // Realiza a criptografia usando a chave pública e o módulo
         return encryptedValue.toString();
     }
 
     public Movie decryptFields(Movie j_temp) {
-        String decTitle = decryptText(j_temp.title);
+        String decTitle = decryptText(j_temp.title); // Descriptografa o título
         
         String[] decGenre = new String[j_temp.genre.length];
         for (int i = 0; i < j_temp.genre.length; i++){
-            decGenre[i] = decryptText(j_temp.genre[i]);
+            decGenre[i] = decryptText(j_temp.genre[i]); // Descriptografa cada gênero
         }
         j_temp.title = decTitle;
         
         
         j_temp.genre = decGenre;
 
-        return j_temp;
+        return j_temp; // Retorna o objeto descriptografado
     }
   
 
     public String decryptText(String encryptedValue) {
         BigInteger encryptedBigInt = new BigInteger(encryptedValue);
-        BigInteger decryptedBigInt = encryptedBigInt.modPow(privateKey, modulus);
+        BigInteger decryptedBigInt = encryptedBigInt.modPow(privateKey, modulus); // Realiza a descriptografia usando a chave privada e o módulo
         byte[] decryptedBytes = decryptedBigInt.toByteArray();
         String decryptedString = new String(decryptedBytes);
         return decryptedString;
